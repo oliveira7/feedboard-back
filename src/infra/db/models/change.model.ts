@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, model } from 'mongoose';
 
 export type ChangeDocument = HydratedDocument<Change>;
 
@@ -25,3 +25,4 @@ export class Change {
 }
 
 export const ChangeSchema = SchemaFactory.createForClass(Change);
+export const ChangeModel = model<Change>('Change', ChangeSchema);

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, model } from 'mongoose';
 
 export type NotificationDocument = HydratedDocument<Notification>;
 
@@ -22,3 +22,4 @@ export class Notification {
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
+export const NotificationModel = model<Notification>('Notification', NotificationSchema);

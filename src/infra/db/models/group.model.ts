@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, model } from 'mongoose';
 
 export type GroupDocument = HydratedDocument<Group>;
 
@@ -28,3 +28,4 @@ export class Group {
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);
+export const GroupModel = model<Group>('Group', GroupSchema);
