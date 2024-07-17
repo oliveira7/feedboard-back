@@ -1,17 +1,11 @@
-import { Module } from '@nestjs/common';
-import { UserController } from '../adapters/controllers/user.controller';
-import { UserService } from '../use_cases/user.service';
-import { UserRepository } from '../infra/db/repositories/user.repository';
-import { USER_REPOSITORY_TOKEN } from '../domain/contants/user.constants';
+import { Module } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
+import { UserController } from './controllers/user.controller'
+import { UserService } from './services/user.service'
 
 @Module({
-  controllers: [UserController],
-  providers: [
-    UserService,
-    {
-      provide: USER_REPOSITORY_TOKEN,
-      useClass: UserRepository
-    }
-  ],
+	imports: [HttpModule, UserModule],
+	controllers: [UserController],
+	providers: [UserService],
 })
-export class UserModule {}
+export class UserModule { }

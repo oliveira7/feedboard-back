@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@app/infrastructure/models": [
+        "../models/src"
+      ],
+      "@app/infrastructure/models/*": [
+        "../models/src/*"
+      ],
+      "@app/core": [
+        "../../src/core"
+      ],
+      "@app/core/*": [
+        "../../src/core/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

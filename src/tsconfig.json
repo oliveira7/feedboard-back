@@ -1,0 +1,39 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist",
+    "baseUrl": "./",
+    "paths": {
+      "@app/infrastructure/config": [
+        "../projects/config/src"
+      ],
+      "@app/infrastructure/config/*": [
+        "../projects/config/src/*"
+      ],
+      "@app/infrastructure/models": [
+        "../projects/models/src"
+      ],
+      "@app/infrastructure/models/*": [
+        "../projects/models/src/*"
+      ],
+      "@app/infrastructure/repositories": [
+        "../projects/repositories/src"
+      ],
+      "@app/infrastructure/repositories/*": [
+        "../projects/repositories/src/*"
+      ],
+      "@app/infrastructure/utils": [
+        "../projects/utils/src"
+      ],
+      "@app/infrastructure/utils/*": [
+        "../projects/utils/src/*"
+      ],
+      "@app/core": [
+        "./core"
+      ],
+      "@app/core/*": [
+        "./core/*"
+      ]
+    }
+  }
+}
