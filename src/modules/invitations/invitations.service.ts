@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class InvitationsService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
+    private readonly usersService: UsersService,
   ) {}
   
   async sendInvitations(emails: string[]): Promise<void> {
@@ -35,5 +37,27 @@ export class InvitationsService {
     });
 
     await Promise.all(invitations);
+  }
+
+  async sendInformations(message: string): Promise<void> {
+    const students = await this.usersService.getAllStudents();
+    const emails = students.map(student => student.email);
+
+    const emailPromises = emails.map(email => {
+      return this.mailerService.sendMail({
+        to: email,
+        subject: 'Informativo importante',
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2 style="color: #4CAF50;">Mensagem da Coordenadora</h2>
+            <p>${message}</p>
+            <p>Atenciosamente,</p>
+            <p>Equipe de Coordenação</p>
+          </div>
+        `,
+      });
+    });
+
+    await Promise.all(emailPromises);
   }
 }

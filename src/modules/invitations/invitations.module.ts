@@ -5,9 +5,11 @@ import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
 import { AuthModule } from '../auth/auth.module';
 import { InvitationsController } from './invitations.controller';
 import { InvitationsService } from './invitations.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     AuthModule,
     MongooseModule.forFeature([{ name: Invitation.name, schema: InvitationSchema }]),
     MailerModule.forRoot({

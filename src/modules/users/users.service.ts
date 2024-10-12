@@ -29,6 +29,10 @@ export class UsersService {
       .exec();
   }
 
+  async getAllStudents(): Promise<User[]> {
+    return this.userModel.find({ role: 'student' }).exec();
+  }
+
   async getUserById(id: string): Promise<UserLeanDocument> {
     const user = await this.userModel
       .findById(id)
