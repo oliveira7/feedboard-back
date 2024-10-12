@@ -18,6 +18,7 @@ export class PostsService {
     //todo: implement pagination
     //todo: implement reactions counts
     //todo: implement comments counts
+    //todo: implement group_id filter
     return await this.postModel.aggregate([
       {
         $match: { 
