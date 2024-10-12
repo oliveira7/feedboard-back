@@ -18,6 +18,12 @@ export class User extends Document {
   @Prop({ type: String, required: true, unique: true })
   email: string;
 
+  @Prop({ type: String})
+  course?: string;
+
+  @Prop({ type: String })
+  description?: string;
+
   @Prop({ type: String, enum: Role, required: true })
   role: Role;
 
@@ -38,6 +44,8 @@ export type UserLeanDocument = {
   _id: string;
   name: string;
   email: string;
+  course?: string;
+  description?: string;
   password_hash: string;
   avatar_url?: string;
   notifications: any[];
