@@ -3,10 +3,8 @@ import {
   Post,
   Body,
   UnauthorizedException,
-  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUsersDto } from '../users/dto/create-users.dto';
 
 @Controller('auth')
 export class AuthController {

@@ -2,10 +2,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
-import { AuthModule } from '../auth/auth.module';
-import { InvitationsController } from './invitations.controller';
+import { UsersModule } from '../users';
+import { AuthModule } from '../auth';
 import { InvitationsService } from './invitations.service';
-import { UsersModule } from '../users/users.module';
+import { InvitationsController } from './invitations.controller';
 
 @Module({
   imports: [
@@ -15,26 +15,17 @@ import { UsersModule } from '../users/users.module';
       { name: Invitation.name, schema: InvitationSchema },
     ]),
     MailerModule.forRoot({
-      // transport: {
-      //   host: process.env.SMTP_HOST === 'sandbox.smtp.mailtrap.io',
-      //   port: process.env.SMTP_PORT === '2525',
-      //   secure: process.env.SMTP_SECURE === 'true',
-      //   auth: {
-      //     user: process.env.SMTP_USER === '6e103951a7e76f',
-      //     pass: process.env.SMTP_PASS === '58e89f4bdeab38',
-      //   },
-      // },
       transport: {
-        host: 'sandbox.smtp.mailtrap.io',
-        port: 2525,
+        host: process.env.MAIL_HOST || 'smtp.mailtrap.io',
+        port: process.env.MAIL_PORT || 2525,
         secure: false,
         auth: {
-          user: '6e103951a7e76f',
-          pass: '58e89f4bdeab38',
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
         },
       },
       defaults: {
-        from: '"No Reply" <noreply@feedboard.com.br>',
+        from: process.env.MAIL_FROM || '"No Reply" <noreply@feedboard.com.br>'
       },
     }),
   ],

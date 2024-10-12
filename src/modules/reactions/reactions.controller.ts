@@ -6,9 +6,10 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth';
+import { CreateReactionsDto } from './dto';
 import { ReactionsService } from './reactions.service';
-import { CreateReactionsDto } from './dto/create-reactions.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
 
 @UseGuards(JwtAuthGuard)
 @Controller('reactions')

@@ -14,11 +14,51 @@ export class PostsService {
     return newPost.save();
   }
 
-  async getPostsByGroup(group_id: string): Promise<Post[]> {
-    return this.postModel.find({ group_id }).exec();
+  async getPosts(group_id: string): Promise<Post[]> {
+    return await this.postModel.aggregate([
+      {
+        $match: { 
+          parent_id: null,
+          group_id: group_id,
+        }
+      },
+      {
+        $lookup: {
+          from: 'Post',
+          localField: '_id',
+          foreignField: 'parent_id',
+          as: 'comments'
+        }
+      },
+      {
+        $unwind: {
+          path: '$comments',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'Post',
+          localField: 'comments._id',
+          foreignField: 'parent_id',
+          as: 'comments.replies'
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          content: { $first: '$content' },
+          created_at: { $first: '$created_at' },
+          comments: { $push: '$comments' },
+        }
+      },
+      {
+        $sort: { created_at: -1 }
+      }
+    ]);
   }
 
-  async getPostById(id: string): Promise<Post> {
+  async getPost(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
       throw new NotFoundException(`Post with ID "${id}" not found`);

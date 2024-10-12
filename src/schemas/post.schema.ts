@@ -23,13 +23,17 @@ export class Post extends Document {
   @Prop({ type: String, required: true, default: null })
   content: string | null;
 
-  @Prop({ type: [{ url: String, type: String }], default: [] })
-  media_urls:
-    | {
-        url: string;
-        type: 'image' | 'video';
-      }[]
-    | [];
+  @Prop({ 
+    type: [{ 
+      url: { type: String, required: true }, 
+      type: { type: String, enum: ['image', 'video'], required: true } 
+    }], 
+    default: [] 
+  })
+  media_urls: Array<{
+    url: string;
+    type: 'image' | 'video';
+  }>;
 
   @Prop({ type: Boolean, required: true, default: false })
   pinned: boolean;

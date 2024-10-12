@@ -8,10 +8,10 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth';
 import { GroupsService } from './groups.service';
-import { CreateGroupDto } from './dto/create-groups.dto';
-import { UpdateGroupDto } from './dto/update-groups.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateGroupDto, UpdateGroupDto } from './dto';
+
 
 @UseGuards(JwtAuthGuard)
 @Controller('groups')
