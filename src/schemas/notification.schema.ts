@@ -16,4 +16,15 @@ export class Notification extends Document {
   read: boolean;
 }
 
+export type NotificationLeanDocument = {
+  _id: string;
+  user_id: string;
+  content: string;
+  read: boolean;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type NotificationDocument = Notification & Document;
+
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

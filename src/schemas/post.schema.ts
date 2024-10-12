@@ -6,23 +6,53 @@ import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 })
 export class Post extends Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  })
   user_id: ObjectId;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Group', required: false })
-  group_id: ObjectId;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Post', default: null })
+  parent_id?: ObjectId | null;
 
-  @Prop({ type: String, required: true })
-  content: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Group', default: null })
+  group_id?: ObjectId | null;
+
+  @Prop({ type: String, required: true, default: null })
+  content: string | null;
 
   @Prop({ type: [{ url: String, type: String }], default: [] })
-  media_urls: {
-    url: string;
-    type: 'image' | 'video';
-  }[];
+  media_urls:
+    | {
+        url: string;
+        type: 'image' | 'video';
+      }[]
+    | [];
 
-  @Prop({ type: Boolean, default: false, required: true })
+  @Prop({ type: Boolean, required: true, default: false })
   pinned: boolean;
 }
+
+export type PostLeanDocument = {
+  _id: string;
+  user_id: string;
+  parent_id?: string | null;
+  group_id?: string | null;
+  content: string | null;
+  media_urls:
+    | {
+        url: string;
+        type: 'image' | 'video';
+      }[]
+    | [];
+  pinned: boolean;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+};
+
+export type PostDocument = Post & Document;
 
 export const PostSchema = SchemaFactory.createForClass(Post);

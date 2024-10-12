@@ -41,9 +41,9 @@ export type UserLeanDocument = {
   password_hash: string;
   avatar_url?: string;
   notifications: any[];
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
 };
 
 export type UserDocument = User & Document;

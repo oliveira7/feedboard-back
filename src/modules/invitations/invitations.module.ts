@@ -11,7 +11,9 @@ import { UsersModule } from '../users/users.module';
   imports: [
     UsersModule,
     AuthModule,
-    MongooseModule.forFeature([{ name: Invitation.name, schema: InvitationSchema }]),
+    MongooseModule.forFeature([
+      { name: Invitation.name, schema: InvitationSchema },
+    ]),
     MailerModule.forRoot({
       // transport: {
       //   host: process.env.SMTP_HOST === 'sandbox.smtp.mailtrap.io',

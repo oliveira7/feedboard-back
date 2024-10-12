@@ -1,5 +1,3 @@
-export class UpdateGroupDto {
-  readonly name?: string;
-  readonly description?: string;
-  readonly members?: string[];
-}
+import { CreateReactionsDto } from './create-reactions.dto';
+
+export class UpdateReactionDto implements Partial<CreateReactionsDto> {}

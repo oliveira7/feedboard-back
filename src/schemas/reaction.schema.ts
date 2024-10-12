@@ -25,4 +25,16 @@ export class Reaction extends Document {
   reaction_type: ReactionType;
 }
 
+export type ReactionLeanDocument = {
+  _id: string;
+  user_id: string;
+  post_id: string;
+  reaction_type: ReactionType;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+};
+
+export type ReactionDocument = Reaction & Document;
+
 export const ReactionSchema = SchemaFactory.createForClass(Reaction);

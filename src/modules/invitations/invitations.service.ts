@@ -10,12 +10,12 @@ export class InvitationsService {
     private readonly mailerService: MailerService,
     private readonly usersService: UsersService,
   ) {}
-  
+
   async sendInvitations(emails: string[]): Promise<void> {
-    const invitations = emails.map(email => {
+    const invitations = emails.map((email) => {
       const token = this.jwtService.sign({ email }, { expiresIn: '7d' });
       const link = `http://feedboard.com/register?token=${token}`;
-      
+
       return this.mailerService.sendMail({
         to: email,
         subject: 'Convite para se registrar',
@@ -41,9 +41,9 @@ export class InvitationsService {
 
   async sendInformations(message: string): Promise<void> {
     const students = await this.usersService.getAllStudents();
-    const emails = students.map(student => student.email);
+    const emails = students.map((student) => student.email);
 
-    const emailPromises = emails.map(email => {
+    const emailPromises = emails.map((email) => {
       return this.mailerService.sendMail({
         to: email,
         subject: 'Informativo importante',

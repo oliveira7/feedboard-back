@@ -11,7 +11,7 @@ import { UsersModule } from '../users/users.module';
       global: true,
       secret: process.env.JWT_SECRET || 'SuperSecretKey',
       signOptions: { expiresIn: process.env.JWT_EXPIRATION || '60m' },
-    })
+    }),
   ],
   providers: [AuthService],
   controllers: [AuthController],
