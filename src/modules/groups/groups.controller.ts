@@ -5,7 +5,7 @@ import {
   Body,
   Param,
   Delete,
-  Patch,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth';
@@ -33,7 +33,7 @@ export class GroupsController {
     return this.groupsService.getGroupById(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async updateGroup(
     @Param('id') id: string,
     @Body() updateGroupDto: UpdateGroupDto,

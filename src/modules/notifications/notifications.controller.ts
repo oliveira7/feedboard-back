@@ -4,7 +4,7 @@ import {
   Post,
   Body,
   Param,
-  Patch,
+  Put,
   Delete,
   UseGuards,
 } from '@nestjs/common';
@@ -29,7 +29,7 @@ export class NotificationsController {
     return this.notificationsService.getNotificationsByUser(userId);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async updateNotificationStatus(
     @Param('id') id: string,
     @Body() updateNotificationDto: UpdateNotificationsDto,
