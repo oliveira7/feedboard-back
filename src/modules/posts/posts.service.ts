@@ -15,11 +15,14 @@ export class PostsService {
   }
 
   async getPosts(group_id: string): Promise<Post[]> {
+    //todo: implement pagination
+    //todo: implement reactions counts
+    //todo: implement comments counts
     return await this.postModel.aggregate([
       {
         $match: { 
           parent_id: null,
-          group_id: group_id,
+          // group_id: group_id,
         }
       },
       {
