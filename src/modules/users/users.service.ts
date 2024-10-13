@@ -61,7 +61,6 @@ export class UsersService {
     updateUserDto: UpdateUsersDto,
   ): Promise<User | null> {
     
-    //posso chamar a services de auth
     let updateData = { ...updateUserDto };
     if (updateUserDto.password_hash) {
       const salt = await bcrypt.genSalt(10);
