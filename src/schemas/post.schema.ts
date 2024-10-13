@@ -25,13 +25,13 @@ export class Post extends Document {
 
   @Prop({ 
     type: [{ 
-      url: { type: String, required: true }, 
+      base64: { type: String, required: true }, 
       type: { type: String, enum: ['image', 'video'], required: true } 
     }], 
     default: [] 
   })
-  media_urls: Array<{
-    url: string;
+  media: Array<{
+    base64: string;
     type: 'image' | 'video';
   }>;
 
@@ -45,9 +45,9 @@ export type PostLeanDocument = {
   parent_id?: string | null;
   group_id?: string | null;
   content: string | null;
-  media_urls:
+  media:
     | {
-        url: string;
+        base64: string;
         type: 'image' | 'video';
       }[]
     | [];

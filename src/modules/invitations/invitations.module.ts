@@ -1,11 +1,11 @@
-import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users';
 import { InvitationsService } from './invitations.service';
 import { InvitationsController } from './invitations.controller';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
 
 @Module({
   imports: [

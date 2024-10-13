@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Group } from '../../schemas/group.schema';
-import { CreateGroupDto } from './dto/create-groups.dto';
-import { UpdateGroupDto } from './dto/update-groups.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Group } from 'src/schemas';
+import { CreateGroupDto, UpdateGroupDto } from './dto';
 
 @Injectable()
 export class GroupsService {

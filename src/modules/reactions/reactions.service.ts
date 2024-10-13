@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Reaction } from '../../schemas/reaction.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Reaction } from 'src/schemas';
 import { CreateReactionsDto } from './dto/create-reactions.dto';
 
 @Injectable()

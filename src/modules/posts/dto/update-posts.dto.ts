@@ -1,5 +1,5 @@
 export class UpdatePostDto {
   readonly content?: string;
-  readonly media_urls?: { url: string; type: 'image' | 'video' }[];
+  readonly media?: { base64: string; type: 'image' | 'video' }[];
   readonly pinned?: boolean;
 }

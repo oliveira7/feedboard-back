@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Post } from '../../schemas/post.schema';
-import { CreatePostDto } from './dto/create-posts.dto';
-import { UpdatePostDto } from './dto/update-posts.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Post } from 'src/schemas';
+import { CreatePostDto, UpdatePostDto } from './dto';
 
 @Injectable()
 export class PostsService {
@@ -14,53 +13,65 @@ export class PostsService {
     return newPost.save();
   }
 
-  async getPosts(group_id: string): Promise<Post[]> {
-    //todo: implement pagination
-    //todo: implement reactions counts
-    //todo: implement comments counts
-    //todo: implement group_id filter
+  async getPosts(group_id: string, page: number = 1, limit: number = 10): Promise<Post[]> {
+    const skip = (page - 1) * limit;
+  
     return await this.postModel.aggregate([
       {
-        $match: { 
+        $match: {
           parent_id: null,
-          // group_id: group_id,
-        }
+          // Descomente e ajuste se precisar filtrar por group_id
+          // group_id: group_id ? new Types.ObjectId(group_id) : null,
+        },
       },
+      {
+        $sort: { created_at: -1 },
+      },
+      { $skip: skip },
+      { $limit: limit },
       {
         $lookup: {
-          from: 'Post',
-          localField: '_id',
-          foreignField: 'parent_id',
-          as: 'comments'
-        }
+          from: 'Post', // Certifique-se de que este é o nome correto da coleção
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$parent_id', '$$postId'] },
+              },
+            },
+            {
+              $sort: { created_at: -1 },
+            },
+            {
+              $limit: 5, // Limite de comentários por post
+            },
+            {
+              $lookup: {
+                from: 'Post',
+                let: { commentId: '$_id' },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $eq: ['$parent_id', '$$commentId'] },
+                    },
+                  },
+                  {
+                    $sort: { created_at: -1 },
+                  },
+                  {
+                    $limit: 5, // Limite de respostas por comentário
+                  },
+                ],
+                as: 'replies',
+              },
+            },
+          ],
+          as: 'comments',
+        },
       },
-      {
-        $unwind: {
-          path: '$comments',
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $lookup: {
-          from: 'Post',
-          localField: 'comments._id',
-          foreignField: 'parent_id',
-          as: 'comments.replies'
-        }
-      },
-      {
-        $group: {
-          _id: '$_id',
-          content: { $first: '$content' },
-          created_at: { $first: '$created_at' },
-          comments: { $push: '$comments' },
-        }
-      },
-      {
-        $sort: { created_at: -1 }
-      }
     ]);
   }
+  
 
   async getPost(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();

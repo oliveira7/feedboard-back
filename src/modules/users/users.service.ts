@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserLeanDocument } from '../../schemas/user.schema';
-import { CreateUsersDto } from './dto/create-users.dto';
-import { UpdateUsersDto } from './dto/update-users.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { CreateUsersDto, UpdateUsersDto } from './dto';
+import { User, UserLeanDocument } from 'src/schemas';
+
 
 @Injectable()
 export class UsersService {
@@ -21,12 +21,27 @@ export class UsersService {
 
     return newUser.save();
   }
+  //https://feedboard-api.vercel.app
+  // async getAllUsers(page: number, limit: number): Promise<UserLeanDocument[]> {
+  async getAllUsers(page: number, limit: number) {
+    const skip = (page - 1) * limit;
 
-  async getAllUsers(): Promise<UserLeanDocument[]> {
-    return this.userModel
+    const users = await this.userModel
       .find({ deleted_at: null })
+      .skip(skip)
+      .limit(limit)
       .lean<UserLeanDocument[] | null>()
       .exec();
+
+    const total = await this.userModel.countDocuments();
+
+    return {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      data: users,
+    };
   }
 
   async getAllStudents(): Promise<User[]> {
