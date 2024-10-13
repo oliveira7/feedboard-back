@@ -21,27 +21,24 @@ export class NotificationsController {
   async createNotification(
     @Body() createNotificationDto: CreateNotificationsDto,
   ) {
-    return this.notificationsService.createNotification(createNotificationDto);
+    return this.notificationsService.create(createNotificationDto);
   }
 
   @Get(':userId')
-  async getNotificationsByUser(@Param('userId') userId: string) {
-    return this.notificationsService.getNotificationsByUser(userId);
+  async getAllByUser(@Param('userId') userId: string) {
+    return this.notificationsService.getAllByUser(userId);
   }
 
   @Put(':id')
-  async updateNotificationStatus(
+  async updateStatus(
     @Param('id') id: string,
     @Body() updateNotificationDto: UpdateNotificationsDto,
   ) {
-    return this.notificationsService.updateNotificationStatus(
-      id,
-      updateNotificationDto,
-    );
+    return this.notificationsService.updateStatus(id, updateNotificationDto);
   }
 
   @Delete(':id')
-  async deleteNotification(@Param('id') id: string) {
-    return this.notificationsService.deleteNotification(id);
+  async delete(@Param('id') id: string) {
+    return this.notificationsService.delete(id);
   }
 }

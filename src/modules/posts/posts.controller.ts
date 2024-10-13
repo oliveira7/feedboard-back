@@ -19,31 +19,32 @@ export class PostsController {
   constructor(private readonly postService: PostsService) {}
 
   @Get()
-  async getPosts(@Query('group_id') group_id: string) {
-    return this.postService.getPosts(group_id);
+  async getPosts(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('group_id') group_id: string,
+  ) {
+    return this.postService.getAll(group_id, page, limit);
   }
 
   @Get(':id')
   async getPost(@Param('id') id: string) {
-    return this.postService.getPost(id);
+    return this.postService.getOne(id);
   }
 
   @Post()
-  async createPost(@Body() createPostDto: CreatePostDto) {
+  async create(@Body() createPostDto: CreatePostDto) {
     console.log(createPostDto);
-    return this.postService.createPost(createPostDto);
+    return this.postService.create(createPostDto);
   }
 
   @Put(':id')
-  async updatePost(
-    @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ) {
-    return this.postService.updatePost(id, updatePostDto);
+  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  async deletePost(@Param('id') id: string) {
-    return this.postService.deletePost(id);
+  async delete(@Param('id') id: string) {
+    return this.postService.delete(id);
   }
 }

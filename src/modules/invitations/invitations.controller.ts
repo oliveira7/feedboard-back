@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Put, Delete, Param } from '@nestjs/common';
 import { InvitationsService } from './invitations.service';
 
 @Controller('invitations')
@@ -14,4 +14,20 @@ export class InvitationsController {
   async sendInformations(@Body('message') message: string): Promise<any> {
     return this.invitationsService.sendInformations(message);
   }
+
+  // @Put('groups/:groupId')
+  // async addToGroup(
+  //   @Param('groupId') groupId: string,
+  //   @Body('userId') userId: string
+  // ): Promise<any> {
+  //   return await this.invitationsService.addToGroup(groupId, userId);
+  // }
+
+  // @Delete('groups/:groupId')
+  // async deleteFromGroup(    
+  //   @Param('groupId') groupId: string,
+  //   @Body('userId') userId: string
+  // ): Promise<any> {
+  //   return await this.invitationsService.deleteFromGroup(groupId, userId);
+  // }
 }

@@ -23,6 +23,9 @@ export class Reaction extends Document {
 
   @Prop({ type: String, enum: ReactionType, required: true })
   reaction_type: ReactionType;
+
+  @Prop({ type: Date, default: null })
+  deleted_at: Date | null;
 }
 
 export type ReactionLeanDocument = {

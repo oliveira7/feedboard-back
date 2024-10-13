@@ -19,17 +19,18 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllUsers(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
+  async getAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query() queries: any,
   ) {
-    return this.usersService.getAllUsers(page, limit);
+    return this.usersService.getAll(page, limit, queries);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    return this.usersService.getUserById(id);
+  async getOne(@Param('id') id: string) {
+    return this.usersService.getOne(id);
   }
 
   @Post()

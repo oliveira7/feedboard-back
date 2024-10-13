@@ -3,11 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  async login(user: any) {
+  async login(user: {
+    email: string;
+    _id: string;
+  }): Promise<{ access_token: string }> {
     if (!user.email || !user._id) {
       throw new UnauthorizedException('User data is missing');
     }

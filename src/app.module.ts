@@ -27,7 +27,7 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
     UsersModule,
     PostsModule,
     ReactionsModule,
-    NotificationsModule
+    NotificationsModule,
   ],
 })
 export class AppModule {}

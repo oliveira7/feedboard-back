@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users';
 
@@ -11,11 +6,13 @@ import { UsersService } from '../users';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
   ) {}
 
   @Post('login')
-  async login(@Body() req) {
+  async login(
+    @Body() req: { email: string; password: string },
+  ): Promise<{ access_token: string }> {
     const user = await this.usersService.validateUser(req.email, req.password);
     if (!user) {
       throw new UnauthorizedException();

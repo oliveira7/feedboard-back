@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Notification } from 'src/schemas';
+import { Notification, NotificationLeanDocument } from 'src/schemas';
 import { CreateNotificationsDto, UpdateNotificationsDto } from './dto';
 
 @Injectable()
@@ -11,23 +11,27 @@ export class NotificationsService {
     private notificationModel: Model<Notification>,
   ) {}
 
-  async createNotification(
+  async getAllByUser(userId: string): Promise<NotificationLeanDocument[]> {
+    return this.notificationModel
+      .find({ user_id: userId })
+      .lean<NotificationLeanDocument[]>()
+      .exec();
+  }
+
+  async create(
     createNotificationDto: CreateNotificationsDto,
   ): Promise<Notification> {
     const newNotification = new this.notificationModel(createNotificationDto);
     return newNotification.save();
   }
 
-  async getNotificationsByUser(userId: string): Promise<Notification[]> {
-    return this.notificationModel.find({ user_id: userId }).exec();
-  }
-
-  async updateNotificationStatus(
+  async updateStatus(
     id: string,
     updateNotificationDto: UpdateNotificationsDto,
-  ): Promise<Notification> {
+  ): Promise<NotificationLeanDocument> {
     const updatedNotification = await this.notificationModel
       .findByIdAndUpdate(id, updateNotificationDto, { new: true })
+      .lean<NotificationLeanDocument>()
       .exec();
     if (!updatedNotification) {
       throw new NotFoundException(`Notification with ID "${id}" not found`);
@@ -35,7 +39,7 @@ export class NotificationsService {
     return updatedNotification;
   }
 
-  async deleteNotification(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const result = await this.notificationModel.findByIdAndDelete(id).exec();
     if (!result) {
       throw new NotFoundException(`Notification with ID "${id}" not found`);

@@ -6,7 +6,7 @@ import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 })
 export class Group extends Document {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   name: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
@@ -14,6 +14,9 @@ export class Group extends Document {
 
   @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'User', default: [] })
   members?: ObjectId[] | [];
+
+  @Prop({ type: Date, default: null })
+  deleted_at: Date | null;
 }
 
 export type GroupLeanDocument = {

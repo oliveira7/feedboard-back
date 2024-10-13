@@ -18,7 +18,7 @@ export class User extends Document {
   @Prop({ type: String, required: true, unique: true })
   email: string;
 
-  @Prop({ type: String})
+  @Prop({ type: String })
   course?: string;
 
   @Prop({ type: String })
@@ -37,7 +37,7 @@ export class User extends Document {
   notifications: Types.ObjectId[];
 
   @Prop({ type: Date, default: null })
-  deleted_at: Date;
+  deleted_at: Date | null;
 }
 
 export type UserLeanDocument = {

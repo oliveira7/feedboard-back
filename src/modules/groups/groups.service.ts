@@ -1,34 +1,41 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Group } from 'src/schemas';
+import { Group, GroupLeanDocument } from 'src/schemas';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 
 @Injectable()
 export class GroupsService {
   constructor(@InjectModel(Group.name) private groupModel: Model<Group>) {}
 
-  async createGroup(createGroupDto: CreateGroupDto): Promise<Group> {
-    const newGroup = new this.groupModel(createGroupDto);
-    return newGroup.save();
+  async getAll(): Promise<GroupLeanDocument[]> {
+    return await this.groupModel
+      .find()
+      .lean<GroupLeanDocument[] | null>()
+      .exec();
   }
 
-  async getAllGroups(): Promise<Group[]> {
-    return this.groupModel.find().exec();
-  }
+  async getOne(id: string): Promise<GroupLeanDocument> {
+    const group = await this.groupModel
+      .findById(id)
+      .lean<GroupLeanDocument | null>()
+      .exec();
 
-  async getGroupById(id: string): Promise<Group> {
-    const group = await this.groupModel.findById(id).exec();
     if (!group) {
       throw new NotFoundException(`Group with ID "${id}" not found`);
     }
+
     return group;
   }
 
-  async updateGroup(
-    id: string,
-    updateGroupDto: UpdateGroupDto,
-  ): Promise<Group> {
+  async create(createGroupDto: CreateGroupDto): Promise<GroupLeanDocument> {
+    const newGroup = new this.groupModel(createGroupDto);
+    const savedGroup = await newGroup.save();
+
+    return savedGroup.toObject() as unknown as GroupLeanDocument;
+  }
+
+  async update(id: string, updateGroupDto: UpdateGroupDto): Promise<Group> {
     const updatedGroup = await this.groupModel
       .findByIdAndUpdate(id, updateGroupDto, { new: true })
       .exec();
@@ -38,12 +45,20 @@ export class GroupsService {
     return updatedGroup;
   }
 
-  async deleteGroup(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const result = await this.groupModel
       .findByIdAndUpdate(id, { deleted_at: new Date() }, { new: true })
       .exec();
     if (!result) {
       throw new NotFoundException(`Group with ID "${id}" not found`);
     }
+  }
+  
+  async addToGroup(groupId: string, userId: string): Promise<void> {
+    await this.groupModel.findByIdAndUpdate(groupId, { group: true }).exec();
+  }
+
+  async deleteFromGroup(groupId: string, userId: string): Promise<void> {
+    await this.groupModel.findByIdAndUpdate(groupId, { group: false }).exec();
   }
 }

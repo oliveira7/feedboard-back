@@ -12,37 +12,36 @@ import { JwtAuthGuard } from '../auth';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 
-
 @UseGuards(JwtAuthGuard)
 @Controller('groups')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @Post()
-  async createGroup(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.createGroup(createGroupDto);
-  }
-
   @Get()
-  async getAllGroups() {
-    return this.groupsService.getAllGroups();
+  async getAll(): Promise<any> {
+    return this.groupsService.getAll();
   }
 
   @Get(':id')
-  async getGroupById(@Param('id') id: string) {
-    return this.groupsService.getGroupById(id);
+  async getOne(@Param('id') id: string): Promise<any> {
+    return this.groupsService.getOne(id);
+  }
+
+  @Post()
+  async create(@Body() createGroupDto: CreateGroupDto): Promise<any> {
+    return this.groupsService.create(createGroupDto);
   }
 
   @Put(':id')
-  async updateGroup(
+  async update(
     @Param('id') id: string,
     @Body() updateGroupDto: UpdateGroupDto,
-  ) {
-    return this.groupsService.updateGroup(id, updateGroupDto);
+  ): Promise<any> {
+    return this.groupsService.update(id, updateGroupDto);
   }
 
   @Delete(':id')
-  async deleteGroup(@Param('id') id: string) {
-    return this.groupsService.deleteGroup(id);
+  async delete(@Param('id') id: string): Promise<any> {
+    return this.groupsService.delete(id);
   }
 }

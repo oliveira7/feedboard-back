@@ -14,6 +14,9 @@ export class Notification extends Document {
 
   @Prop({ type: Boolean, default: false })
   read: boolean;
+
+  @Prop({ type: Date, default: null })
+  deleted_at: Date | null;
 }
 
 export type NotificationLeanDocument = {

@@ -23,12 +23,14 @@ export class Post extends Document {
   @Prop({ type: String, required: true, default: null })
   content: string | null;
 
-  @Prop({ 
-    type: [{ 
-      base64: { type: String, required: true }, 
-      type: { type: String, enum: ['image', 'video'], required: true } 
-    }], 
-    default: [] 
+  @Prop({
+    type: [
+      {
+        base64: { type: String, required: true },
+        type: { type: String, enum: ['image', 'video'], required: true },
+      },
+    ],
+    default: [],
   })
   media: Array<{
     base64: string;
@@ -37,6 +39,9 @@ export class Post extends Document {
 
   @Prop({ type: Boolean, required: true, default: false })
   pinned: boolean;
+
+  @Prop({ type: Date, default: null })
+  deleted_at: Date | null;
 }
 
 export type PostLeanDocument = {

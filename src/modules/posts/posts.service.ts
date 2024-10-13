@@ -8,22 +8,18 @@ import { CreatePostDto, UpdatePostDto } from './dto';
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  async createPost(createPostDto: CreatePostDto): Promise<Post> {
-    const newPost = new this.postModel(createPostDto);
-    return newPost.save();
-  }
+  async getAll(group_id: string, page: number, limit: number): Promise<Post[]> {
+    const matchStage: any = { parent_id: null };
+    if (group_id) {
+      matchStage.group_id = new Types.ObjectId(group_id);
+    }
 
-  async getPosts(group_id: string, page: number = 1, limit: number = 10): Promise<Post[]> {
+    page = Math.max(1, page);
+    limit = Math.max(1, limit);
     const skip = (page - 1) * limit;
-  
+
     return await this.postModel.aggregate([
-      {
-        $match: {
-          parent_id: null,
-          // Descomente e ajuste se precisar filtrar por group_id
-          // group_id: group_id ? new Types.ObjectId(group_id) : null,
-        },
-      },
+      { $match: matchStage },
       {
         $sort: { created_at: -1 },
       },
@@ -31,7 +27,7 @@ export class PostsService {
       { $limit: limit },
       {
         $lookup: {
-          from: 'Post', // Certifique-se de que este é o nome correto da coleção
+          from: 'Post',
           let: { postId: '$_id' },
           pipeline: [
             {
@@ -43,7 +39,7 @@ export class PostsService {
               $sort: { created_at: -1 },
             },
             {
-              $limit: 5, // Limite de comentários por post
+              $limit: limit,
             },
             {
               $lookup: {
@@ -59,7 +55,7 @@ export class PostsService {
                     $sort: { created_at: -1 },
                   },
                   {
-                    $limit: 5, // Limite de respostas por comentário
+                    $limit: limit,
                   },
                 ],
                 as: 'replies',
@@ -71,9 +67,8 @@ export class PostsService {
       },
     ]);
   }
-  
 
-  async getPost(id: string): Promise<Post> {
+  async getOne(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
       throw new NotFoundException(`Post with ID "${id}" not found`);
@@ -81,7 +76,12 @@ export class PostsService {
     return post;
   }
 
-  async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+  async create(createPostDto: CreatePostDto): Promise<Post> {
+    const newPost = new this.postModel(createPostDto);
+    return newPost.save();
+  }
+
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     const updatedPost = await this.postModel
       .findByIdAndUpdate(id, updatePostDto, { new: true })
       .exec();
@@ -91,7 +91,7 @@ export class PostsService {
     return updatedPost;
   }
 
-  async deletePost(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const result = await this.postModel
       .findByIdAndUpdate(id, { deleted_at: new Date() }, { new: true })
       .exec();

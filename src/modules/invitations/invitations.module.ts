@@ -3,13 +3,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users';
-import { InvitationsService } from './invitations.service';
+import { InvitationsService } from '../invitations';
+import { GroupsModule } from '../groups';
 import { InvitationsController } from './invitations.controller';
 import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
 
 @Module({
   imports: [
     UsersModule,
+    GroupsModule,
     MongooseModule.forFeature([
       { name: Invitation.name, schema: InvitationSchema },
     ]),
@@ -26,7 +28,9 @@ import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
           },
         },
         defaults: {
-          from: configService.get<string>('MAIL_FROM') || '"No Reply" <noreply@feedboard.com.br>',
+          from:
+            configService.get<string>('MAIL_FROM') ||
+            '"No Reply" <noreply@feedboard.com.br>',
         },
       }),
       inject: [ConfigService],

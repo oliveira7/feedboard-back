@@ -10,14 +10,12 @@ export class ReactionsService {
     @InjectModel(Reaction.name) private reactionModel: Model<Reaction>,
   ) {}
 
-  async createReaction(
-    createReactionDto: CreateReactionsDto,
-  ): Promise<Reaction> {
+  async create(createReactionDto: CreateReactionsDto): Promise<Reaction> {
     const newReaction = new this.reactionModel(createReactionDto);
     return newReaction.save();
   }
 
-  async deleteReaction(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     const result = await this.reactionModel.findByIdAndDelete(id).exec();
     if (!result) {
       throw new NotFoundException(`Reaction with ID "${id}" not found`);
