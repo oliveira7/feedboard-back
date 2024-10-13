@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserLeanDocument } from '../../schemas/user.schema';
@@ -60,8 +60,19 @@ export class UsersService {
     id: string,
     updateUserDto: UpdateUsersDto,
   ): Promise<User | null> {
+    
+    //posso chamar a services de auth
+    let updateData = { ...updateUserDto };
+    if (updateUserDto.password_hash) {
+      const salt = await bcrypt.genSalt(10);
+      updateData = {
+        ...updateData,
+        password_hash: await bcrypt.hash(updateUserDto.password_hash, salt),
+      };
+    }
+    console.log(updateData);
     const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
     if (!updatedUser) {
       throw new NotFoundException(`User with ID "${id}" not found`);
@@ -76,5 +87,14 @@ export class UsersService {
     if (!result) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
+  }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.getUserByEmail(email);
+    if (user && (await bcrypt.compare(password, user.password_hash))) {
+      const { password_hash, ...result } = user;
+      return result;
+    }
+    throw new UnauthorizedException('Invalid credentials');
   }
 }

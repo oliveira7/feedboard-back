@@ -1,12 +1,11 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { InvitationsService } from './invitations.service';
 
-//TODO: Posso dividir responsabilidades ou torna essa controller de envios de e-mails mais genérica
 @Controller('invitations')
 export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
 
-  @Post('send')
+  @Post('sends')
   async sendInvitations(@Body('emails') emails: string[]): Promise<any> {
     return await this.invitationsService.sendInvitations(emails);
   }

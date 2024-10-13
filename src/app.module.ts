@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { UsersModule } from './modules/users/users.module';
@@ -11,17 +11,23 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+      }),
+      inject: [ConfigService],
+    }),
     InvitationsModule,
     AuthModule,
     GroupsModule,
     UsersModule,
     PostsModule,
     ReactionsModule,
-    NotificationsModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    NotificationsModule
   ],
 })
 export class AppModule {}
