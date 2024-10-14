@@ -18,16 +18,16 @@ export class ExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let message =
+    let message: any =
       exception instanceof HttpException
         ? exception.getResponse()
         : 'Erro interno do servidor';
 
     response.status(status).json({
       statusCode: status,
-      message,
-      timestamp: new Date().toISOString(),
+      message: message.error,
       path: request.url,
+      timestamp: new Date().toISOString(),
     });
   }
 }

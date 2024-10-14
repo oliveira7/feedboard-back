@@ -10,6 +10,6 @@ export class CreateUsersDto {
   readonly description?: string;
   readonly email: string;
   readonly password_hash: string;
-  readonly avatar_url?: string;
+  readonly avatar_base64?: string;
   readonly role: Role;
 }

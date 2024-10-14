@@ -28,7 +28,7 @@ export class User extends Document {
   role: Role;
 
   @Prop({ type: String, required: true })
-  avatar_url: string;
+  avatar_base64: string;
 
   @Prop({ type: String, required: true })
   password_hash: string;
@@ -47,7 +47,7 @@ export type UserLeanDocument = {
   course?: string;
   description?: string;
   password_hash: string;
-  avatar_url?: string;
+  avatar_base64?: string;
   notifications: any[];
   created_at: Date;
   updated_at: Date;

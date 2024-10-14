@@ -17,7 +17,7 @@ export class UsersService {
     page: number,
     limit: number,
     queries: any,
-  ): Promise<{ total: number; users: UserLeanDocument[] }> {
+  ): Promise<UserLeanDocument[]> {
     page = Math.max(1, page);
     limit = Math.max(1, limit);
     const skip = (page - 1) * limit;
@@ -31,18 +31,13 @@ export class UsersService {
     if (queries.course)
       query.course = { $regex: new RegExp(queries.course, 'i') };
 
-    const [total, users] = await Promise.all([
-      this.userModel.countDocuments(query).exec(),
-      this.userModel
-        .find(query)
-        .select('-password_hash')
-        .skip(skip)
-        .limit(limit)
-        .lean<UserLeanDocument[]>()
-        .exec(),
-    ]);
-
-    return { total, users };
+    return this.userModel
+      .find(query)
+      .select('-password_hash')
+      .skip(skip)
+      .limit(limit)
+      .lean<UserLeanDocument[]>()
+      .exec();
   }
 
   async getOne(id: string): Promise<UserLeanDocument> {
@@ -50,13 +45,15 @@ export class UsersService {
       .findById(id)
       .lean<UserLeanDocument | null>()
       .exec();
+
     if (!user) {
-      throw new NotFoundException(`User with ID "${id}" not found`);
+      throw new NotFoundException(`Usuário com ID "${id}" não foi encontrado`);
     }
+
     return user;
   }
 
-  async create(createUserDto: CreateUsersDto): Promise<User> {
+  async create(createUserDto: CreateUsersDto): Promise<UserLeanDocument> {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(createUserDto.password_hash, salt);
 
@@ -65,13 +62,15 @@ export class UsersService {
       password_hash: hashedPassword,
     });
 
-    return newUser.save();
+    const savedUser = await newUser.save();
+
+    return savedUser.toObject() as unknown as UserLeanDocument;
   }
 
   async update(
     id: string,
     updateUserDto: UpdateUsersDto,
-  ): Promise<User | null> {
+  ): Promise<UserLeanDocument> {
     let updateData = { ...updateUserDto };
     if (updateUserDto.password_hash) {
       const salt = await bcrypt.genSalt(10);
@@ -80,13 +79,16 @@ export class UsersService {
         password_hash: await bcrypt.hash(updateUserDto.password_hash, salt),
       };
     }
-    console.log(updateData);
+
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateData, { new: true })
+      .lean<UserLeanDocument | null>()
       .exec();
+
     if (!updatedUser) {
-      throw new NotFoundException(`User with ID "${id}" not found`);
+      throw new NotFoundException(`Usuário com ID "${id}" não foi encontrado`);
     }
+
     return updatedUser;
   }
 
@@ -94,13 +96,21 @@ export class UsersService {
     const result = await this.userModel
       .findByIdAndUpdate(id, { deleted_at: new Date() }, { new: true })
       .exec();
+
     if (!result) {
-      throw new NotFoundException(`User with ID "${id}" not found`);
+      throw new NotFoundException(
+        `Usuário com o ID "${id}" não foi encontrado`,
+      );
     }
+
+    return;
   }
 
-  async getAllStudents(): Promise<User[]> {
-    return this.userModel.find({ role: 'student' }).exec();
+  async getAllStudents(): Promise<UserLeanDocument[]> {
+    return this.userModel
+      .find({ role: 'student' })
+      .lean<UserLeanDocument[]>()
+      .exec();
   }
 
   async getUserByEmail(email: string): Promise<UserLeanDocument> {
@@ -110,17 +120,26 @@ export class UsersService {
       .exec();
 
     if (!user) {
-      throw new NotFoundException(`User with email "${email}" not found`);
+      throw new NotFoundException(
+        `Usuário com o EMAIL "${email}" não foi encontrado`,
+      );
     }
+
     return user;
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserLeanDocument> {
     const user = await this.getUserByEmail(email);
+
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       const { password_hash, ...result } = user;
-      return result;
+
+      return result as UserLeanDocument;
     }
-    throw new UnauthorizedException('Invalid credentials');
+
+    throw new UnauthorizedException('Credenciais inválidas');
   }
 }

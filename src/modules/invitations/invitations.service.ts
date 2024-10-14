@@ -1,8 +1,9 @@
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users';
 import { GroupsService } from '../groups';
+import { GroupLeanDocument } from 'src/schemas';
 
 @Injectable()
 export class InvitationsService {
@@ -10,7 +11,7 @@ export class InvitationsService {
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly usersService: UsersService,
-    private readonly groupsService: GroupsService
+    private readonly groupsService: GroupsService,
   ) {}
 
   async sendInvitations(emails: string[]): Promise<void> {
@@ -63,21 +64,14 @@ export class InvitationsService {
     await Promise.all(emailPromises);
   }
 
-  async addToGroup(groupId: string, userId: string): Promise<void> {
-    const user = await this.usersService.getOne(userId)
-    if (!user) {
-      throw new NotFoundException(`User with ID "${userId}" not found`);
-    }
+  async addToGroup(groupId: string, email: string): Promise<GroupLeanDocument> {
+    const user = await this.usersService.getUserByEmail(email);
 
-    await this.groupsService.addToGroup(groupId, user._id);
+    return await this.groupsService.addUserToGroup(groupId, user._id);
   }
 
-  async deleteFromGroup(groupId: string, userId: string): Promise<void> {
-    const user = await this.usersService.getOne(userId);
-    if (!user) {
-      throw new NotFoundException(`User with ID "${userId}" not found`);
-    }
-
-    await this.groupsService.deleteFromGroup(groupId, user._id);
+  async deleteFromGroup(groupId: string, email: string): Promise<void> {
+    const user = await this.usersService.getUserByEmail(email);
+    await this.groupsService.deleteUserFromGroup(groupId, user._id);
   }
 }

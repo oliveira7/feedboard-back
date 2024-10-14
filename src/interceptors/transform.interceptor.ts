@@ -28,9 +28,28 @@ export class TransformInterceptor<T>
         const request = ctx.getRequest();
         const statusCode = response.statusCode;
 
+        let message = '';
+        switch (request.method) {
+          case 'GET':
+            message = 'Dados recuperados com sucesso';
+            break;
+          case 'POST':
+            message = 'Dados criados com sucesso';
+            break;
+          case 'PUT':
+          case 'PATCH':
+            message = 'Dados atualizados com sucesso';
+            break;
+          case 'DELETE':
+            message = 'Dados excluídos com sucesso';
+            break;
+          default:
+            message = 'Operação realizada com sucesso';
+        }
+
         return {
           statusCode,
-          message: 'Operação realizada com sucesso',
+          message,
           data,
         };
       }),

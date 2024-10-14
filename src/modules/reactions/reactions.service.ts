@@ -1,7 +1,7 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Reaction } from 'src/schemas';
+import { Reaction, ReactionLeanDocument } from 'src/schemas';
 import { CreateReactionsDto } from './dto/create-reactions.dto';
 
 @Injectable()
@@ -10,15 +10,24 @@ export class ReactionsService {
     @InjectModel(Reaction.name) private reactionModel: Model<Reaction>,
   ) {}
 
-  async create(createReactionDto: CreateReactionsDto): Promise<Reaction> {
+  async create(
+    createReactionDto: CreateReactionsDto,
+  ): Promise<ReactionLeanDocument> {
     const newReaction = new this.reactionModel(createReactionDto);
-    return newReaction.save();
+    const savedReaction = await newReaction.save();
+
+    return savedReaction.toObject() as unknown as ReactionLeanDocument;
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.reactionModel.findByIdAndDelete(id).exec();
+    const result = await this.reactionModel
+      .findByIdAndDelete(new Types.ObjectId(id))
+      .exec();
+
     if (!result) {
       throw new NotFoundException(`Reaction with ID "${id}" not found`);
     }
+
+    return;
   }
 }

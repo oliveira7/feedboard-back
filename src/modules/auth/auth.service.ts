@@ -6,8 +6,8 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   async login(user: {
-    email: string;
     _id: string;
+    email: string;
   }): Promise<{ access_token: string }> {
     if (!user.email || !user._id) {
       throw new UnauthorizedException('User data is missing');
