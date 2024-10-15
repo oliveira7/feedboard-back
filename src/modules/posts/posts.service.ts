@@ -39,6 +39,24 @@ export class PostsService {
         $unwind: '$author',
       },
       {
+        $lookup: {
+          from: 'Post',
+          localField: '_id',
+          foreignField: 'parent_id',
+          as: 'children',
+        },
+      },
+      {
+        $addFields: {
+          totalChildren: { $size: '$children' },
+        },
+      },
+      {
+        $project: {
+          'children': 0,
+        },
+      },
+      {
         $sort: { created_at: -1 },
       },
       {
@@ -52,6 +70,7 @@ export class PostsService {
           _id: 1,
           parent_id: 1,
           group_id: 1,
+          totalChildren: 1,
           pinned: 1,
           content: 1,
           media: 1,

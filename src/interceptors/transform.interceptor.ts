@@ -47,6 +47,14 @@ export class TransformInterceptor<T>
             message = 'Operação realizada com sucesso';
         }
 
+        if (statusCode >= 401) {
+          message = 'Operação não autorizada';
+        }
+
+        if (statusCode === 404) {
+          message = 'Nenhum dado encontrado';
+        }
+
         return {
           statusCode,
           message,
