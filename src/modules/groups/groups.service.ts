@@ -39,13 +39,15 @@ export class GroupsService {
           created_by: 1,
           created_at: 1,
           updated_at: 1,
-          members: {
-            _id: 1,
-            name: 1,
-            avatar_base64: 1,
-            course: 1,
-            role: 1,
-          },
+          members: [
+            {
+              _id: '$members._id',
+              name: '$members.name',
+              avatar_base64: '$members.avatar_base64',
+              course: '$members.course',
+              role: '$members.role',
+            },
+          ]
         },
       },
     ]);
