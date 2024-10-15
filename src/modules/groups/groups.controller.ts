@@ -21,6 +21,7 @@ export class GroupsController {
 
   @Get()
   async getAllByUser(@Req() req: any): Promise<GroupLeanDocument[]> {
+
     return this.groupsService.getAllByUser(req.user._id);
   }
 
@@ -31,9 +32,10 @@ export class GroupsController {
 
   @Post()
   async create(
+    @Req() req: any,
     @Body() createGroupDto: CreateGroupDto,
   ): Promise<GroupLeanDocument> {
-    return this.groupsService.create(createGroupDto);
+    return this.groupsService.create(req.user._id, createGroupDto);
   }
 
   @Put(':id')

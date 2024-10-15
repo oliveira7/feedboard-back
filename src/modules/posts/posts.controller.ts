@@ -23,10 +23,9 @@ export class PostsController {
   @Get()
   async getPosts(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('group_id') group_id: string,
-  // ): Promise<PostLeanDocument[]> {
-  ) {
+    @Query('limit') limit: number = 5,
+    @Query('group_id') group_id?: string,
+  ): Promise<PostLeanDocument[]> {
     return this.postService.getAll(group_id, page, limit);
   }
 

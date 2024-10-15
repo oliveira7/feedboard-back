@@ -12,57 +12,52 @@ export class PostsService {
     group_id: string,
     page: number,
     limit: number,
-    // ): Promise<PostLeanDocument[]> {
-  ) {
+  ): Promise<PostLeanDocument[]> {
     const matchStage: any = { parent_id: null, deleted_at: null };
     if (group_id) {
       matchStage.group_id = new Types.ObjectId(group_id);
     }
 
-    return await this.getPostsWithComments(page || 1, limit || 10);
-  }
-
-  async getPostsWithComments(page = 1, pageSize = 10) {
-    const posts = await this.postModel.find()
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .lean();
-  
-    const postIds = posts.map((post) => post._id);
-  
-    const allComments = await this.postModel.find({
-      parent_id: { $in: postIds },
-      deleted_at: null,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
-  
-    const commentIds = allComments.map((comment) => comment._id);
-    const allReplies = await this.postModel.find({
-      parent_id: { $in: commentIds },
-      deleted_at: null,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
-  
-    const buildTree = (parentId, allItems) => {
-      return allItems
-        .filter((item) => String(item.parent_id) === String(parentId))
-        .slice(0, 5)
-        .map((item) => ({
-          ...item,
-          replies: buildTree(item._id, allReplies).slice(0, 5),
-        }));
-    };
-  
-
-    const postsWithComments = posts.map((post) => ({
-      ...post,
-      comments: buildTree(post._id, allComments),
-    }));
-  
-    return postsWithComments;
+    const skip = (page - 1) * limit;
+    return this.postModel.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: 'User',
+          localField: 'user_id',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      {
+        $unwind: '$user'
+      },
+      {
+        $sort: { created_at: -1 }
+      },
+      {
+        $skip: skip
+      },
+      // {
+      //   $limit: limit
+      // },
+      {
+        $project: {
+          _id: 1,
+          parent_id: 1,
+          pinned: 1,
+          content: 1,
+          media: 1,
+          created_at: 1,
+          updated_at: 1,
+          user: {
+            _id: 1,
+            name: 1,
+            avatar_base64: 1
+          }
+        }
+      }
+    ]);
   }
   
   async getOne(id: string): Promise<PostLeanDocument> {

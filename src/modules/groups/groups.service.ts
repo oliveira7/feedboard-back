@@ -58,8 +58,12 @@ export class GroupsService {
     return group as unknown as GroupLeanDocument;
   }
 
-  async create(createGroupDto: CreateGroupDto): Promise<GroupLeanDocument> {
-    const newGroup = new this.groupModel(createGroupDto);
+  async create(userId: string, createGroupDto: CreateGroupDto): Promise<GroupLeanDocument> {
+    const newGroup = new this.groupModel({
+      ...createGroupDto, 
+      created_by: new Types.ObjectId(userId), 
+      members: [new Types.ObjectId(userId)]
+    });
     const savedGroup = await newGroup.save();
 
     return savedGroup.toObject() as unknown as GroupLeanDocument;
