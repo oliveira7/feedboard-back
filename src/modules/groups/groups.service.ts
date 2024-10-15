@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Group, GroupLeanDocument } from 'src/schemas';
@@ -19,16 +19,43 @@ export class GroupsService {
   }
 
   async getOne(id: string): Promise<GroupLeanDocument> {
-    const group = await this.groupModel
-      .findById(id)
-      .lean<GroupLeanDocument | null>()
-      .exec();
+    const group = await this.groupModel.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(id) }
+      },
+      {
+        $lookup: {
+          from: 'User',
+          localField: 'members',
+          foreignField: '_id',
+          as: 'members'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          created_by: 1,
+          created_at: 1,
+          updated_at: 1,
+          deleted_at: 1,
+          members: {
+            _id: 1,
+            name: 1,
+            avatar_base64: 1,
+            course: 1,
+            role: 1,
+          }
+        }
+      }
+    ]);
+    
 
     if (!group) {
       throw new NotFoundException(`Grupo com ID "${id}" não foi encontrado`);
     }
 
-    return group;
+    return group as unknown as GroupLeanDocument;
   }
 
   async create(createGroupDto: CreateGroupDto): Promise<GroupLeanDocument> {
