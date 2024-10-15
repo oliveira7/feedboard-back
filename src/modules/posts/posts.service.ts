@@ -26,11 +26,11 @@ export class PostsService {
           from: 'User',
           localField: 'user_id',
           foreignField: '_id',
-          as: 'user'
+          as: 'author'
         }
       },
       {
-        $unwind: '$user'
+        $unwind: '$author'
       },
       {
         $sort: { created_at: -1 }
@@ -50,7 +50,7 @@ export class PostsService {
           media: 1,
           created_at: 1,
           updated_at: 1,
-          user: {
+          author: {
             _id: 1,
             name: 1,
             avatar_base64: 1
