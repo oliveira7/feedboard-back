@@ -1,2 +1,2 @@
-export * from './create-invitations.dto';
-export * from './update-invitations.dto';
+export * from './email.dto';
+export * from './emails.dto';

@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
 
+enum MediaType {
+  image = 'image',
+  video = 'video',
+}
+
 @Schema({
   collection: 'Post',
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
@@ -27,14 +32,14 @@ export class Post extends Document {
     type: [
       {
         base64: { type: String, required: true },
-        type: { type: String, enum: ['image', 'video'], required: true },
+        type: { type: String, enum: MediaType, required: true },
       },
     ],
     default: [],
   })
   media: Array<{
     base64: string;
-    type: 'image' | 'video';
+    type: MediaType;
   }>;
 
   @Prop({ type: Boolean, required: true, default: false })
@@ -53,7 +58,7 @@ export type PostLeanDocument = {
   media:
     | {
         base64: string;
-        type: 'image' | 'video';
+        type: MediaType;
       }[]
     | [];
   pinned: boolean;

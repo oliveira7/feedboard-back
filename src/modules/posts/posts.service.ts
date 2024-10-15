@@ -9,17 +9,23 @@ export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
   async getAll(
-    group_id: string,
-    page: number,
-    limit: number,
-  ): Promise<PostLeanDocument[]> {
+    groupId: string,
+    parentId: string,
+    page: number = 1,
+    limit: number = 5,
+  // ): Promise<PostLeanDocument[]> {
+  ) {
     const matchStage: any = { parent_id: null, deleted_at: null };
-    if (group_id) {
-      matchStage.group_id = new Types.ObjectId(group_id);
+    if (groupId) {
+      matchStage.group_id = new Types.ObjectId(groupId);
+    }
+
+    if (parentId) {
+      matchStage.parent_id = new Types.ObjectId(parentId);
     }
 
     const skip = (page - 1) * limit;
-    return this.postModel.aggregate([
+    const posts = await this.postModel.aggregate([
       { $match: matchStage },
       {
         $lookup: {
@@ -38,13 +44,14 @@ export class PostsService {
       {
         $skip: skip,
       },
-      // {
-      //   $limit: limit
-      // },
+      {
+        $limit: Number(limit),
+      },
       {
         $project: {
           _id: 1,
           parent_id: 1,
+          group_id: 1,
           pinned: 1,
           content: 1,
           media: 1,
@@ -56,8 +63,20 @@ export class PostsService {
             avatar_base64: 1,
           },
         },
-      },
+      }
     ]);
+
+    const total = await this.postModel.countDocuments(
+      { ...matchStage, deleted_at: null },
+    ).exec();
+    
+    return {
+      page, 
+      totalPages: Math.ceil(total / limit),
+      limit,
+      total,
+      posts
+    }
   }
 
   async getOne(id: string): Promise<PostLeanDocument> {
@@ -73,8 +92,9 @@ export class PostsService {
     return post;
   }
 
-  async create(createPostDto: CreatePostDto): Promise<PostLeanDocument> {
-    const newPost = new this.postModel(createPostDto);
+  //TODO: validar criações de postagens(id do pai é do pai mesmo??)
+  async create(userId: string, createPostDto: CreatePostDto): Promise<PostLeanDocument> {
+    const newPost = new this.postModel({...createPostDto, user_id: userId});
     const savedPost = await newPost.save();
 
     return savedPost.toObject() as unknown as PostLeanDocument;

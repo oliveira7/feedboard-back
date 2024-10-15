@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsersDto, UpdateUsersDto } from './dto';
@@ -21,8 +22,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(
-    @Query('limit') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
     @Query() queries: any,
   ): Promise<UserLeanDocument[]> {
     return this.usersService.getAll(page, limit, queries);
@@ -34,8 +35,6 @@ export class UsersController {
     return this.usersService.getOne(id);
   }
 
-  //TODO: Precisa estar online ou deixo aberto?
-  //acho que já posso criar no db com email e ao chegar com token já loga o cara e ele termina o cadastro
   @Post()
   async create(
     @Body() createUserDto: CreateUsersDto,

@@ -9,8 +9,9 @@ import {
   Query,
   UseGuards,
   Req,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth';
+import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { PostsService } from './posts.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { PostLeanDocument } from 'src/schemas';
@@ -22,11 +23,13 @@ export class PostsController {
 
   @Get()
   async getPosts(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 5,
-    @Query('group_id') group_id?: string,
-  ): Promise<PostLeanDocument[]> {
-    return this.postService.getAll(group_id, page, limit);
+    @Query('groupId') groupId?: string,
+    @Query('parentId') parentId?: string,
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 5,
+  // ): Promise<PostLeanDocument[]> {
+  ) {
+    return this.postService.getAll(groupId, parentId, page, limit);
   }
 
   @Get(':id')
@@ -36,9 +39,11 @@ export class PostsController {
 
   @Post()
   async create(
+    @Req() req: ReqUserDto,
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostLeanDocument> {
-    return this.postService.create(createPostDto);
+    const { _id } = req.user;
+    return this.postService.create(_id, createPostDto);
   }
 
   @Put(':id')

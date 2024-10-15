@@ -31,6 +31,7 @@ export class GroupsService {
           as: 'members',
         },
       },
+      { $unwind: '$members' },
       {
         $project: {
           _id: 1,
@@ -38,7 +39,6 @@ export class GroupsService {
           created_by: 1,
           created_at: 1,
           updated_at: 1,
-          deleted_at: 1,
           members: {
             _id: 1,
             name: 1,

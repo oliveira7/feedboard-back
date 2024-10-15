@@ -4,6 +4,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users';
 import { GroupsService } from '../groups';
 import { GroupLeanDocument } from 'src/schemas';
+import { EmailsDto } from './dto';
 
 @Injectable()
 export class InvitationsService {

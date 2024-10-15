@@ -9,7 +9,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth';
+import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 import { GroupLeanDocument } from 'src/schemas';
@@ -20,8 +20,9 @@ export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @Get()
-  async getAllByUser(@Req() req: any): Promise<GroupLeanDocument[]> {
-    return this.groupsService.getAllByUser(req.user._id);
+  async getAllByUser(@Req() req: ReqUserDto): Promise<GroupLeanDocument[]> {
+    const { _id } = req.user;
+    return this.groupsService.getAllByUser(_id);
   }
 
   @Get(':id')
@@ -31,10 +32,11 @@ export class GroupsController {
 
   @Post()
   async create(
-    @Req() req: any,
+    @Req() req: ReqUserDto,
     @Body() createGroupDto: CreateGroupDto,
   ): Promise<GroupLeanDocument> {
-    return this.groupsService.create(req.user._id, createGroupDto);
+    const { _id } = req.user;
+    return this.groupsService.create(_id, createGroupDto);
   }
 
   @Put(':id')
