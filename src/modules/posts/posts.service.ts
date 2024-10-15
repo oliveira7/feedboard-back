@@ -26,17 +26,17 @@ export class PostsService {
           from: 'User',
           localField: 'user_id',
           foreignField: '_id',
-          as: 'author'
-        }
+          as: 'author',
+        },
       },
       {
-        $unwind: '$author'
+        $unwind: '$author',
       },
       {
-        $sort: { created_at: -1 }
+        $sort: { created_at: -1 },
       },
       {
-        $skip: skip
+        $skip: skip,
       },
       // {
       //   $limit: limit
@@ -53,13 +53,13 @@ export class PostsService {
           author: {
             _id: 1,
             name: 1,
-            avatar_base64: 1
-          }
-        }
-      }
+            avatar_base64: 1,
+          },
+        },
+      },
     ]);
   }
-  
+
   async getOne(id: string): Promise<PostLeanDocument> {
     const post = await this.postModel
       .findById(id)

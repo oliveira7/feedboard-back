@@ -21,15 +21,15 @@ export class GroupsService {
   async getOne(id: string): Promise<GroupLeanDocument> {
     const group = await this.groupModel.aggregate([
       {
-        $match: { _id: new mongoose.Types.ObjectId(id) }
+        $match: { _id: new mongoose.Types.ObjectId(id) },
       },
       {
         $lookup: {
           from: 'User',
           localField: 'members',
           foreignField: '_id',
-          as: 'members'
-        }
+          as: 'members',
+        },
       },
       {
         $project: {
@@ -45,11 +45,10 @@ export class GroupsService {
             avatar_base64: 1,
             course: 1,
             role: 1,
-          }
-        }
-      }
+          },
+        },
+      },
     ]);
-    
 
     if (!group) {
       throw new NotFoundException(`Grupo com ID "${id}" não foi encontrado`);
@@ -58,11 +57,14 @@ export class GroupsService {
     return group as unknown as GroupLeanDocument;
   }
 
-  async create(userId: string, createGroupDto: CreateGroupDto): Promise<GroupLeanDocument> {
+  async create(
+    userId: string,
+    createGroupDto: CreateGroupDto,
+  ): Promise<GroupLeanDocument> {
     const newGroup = new this.groupModel({
-      ...createGroupDto, 
-      created_by: new Types.ObjectId(userId), 
-      members: [new Types.ObjectId(userId)]
+      ...createGroupDto,
+      created_by: new Types.ObjectId(userId),
+      members: [new Types.ObjectId(userId)],
     });
     const savedGroup = await newGroup.save();
 

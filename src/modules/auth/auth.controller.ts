@@ -14,7 +14,7 @@ export class AuthController {
     @Body() req: { email: string; password: string },
   ): Promise<{ access_token: string }> {
     const user = await this.usersService.validateUser(req.email, req.password);
-    
+
     if (!user) {
       throw new UnauthorizedException();
     }

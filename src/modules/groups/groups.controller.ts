@@ -21,7 +21,6 @@ export class GroupsController {
 
   @Get()
   async getAllByUser(@Req() req: any): Promise<GroupLeanDocument[]> {
-
     return this.groupsService.getAllByUser(req.user._id);
   }
 
