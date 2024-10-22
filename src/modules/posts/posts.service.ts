@@ -3,16 +3,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, PostLeanDocument } from 'src/schemas';
 import { CreatePostDto, UpdatePostDto } from './dto';
+import { PostType } from './posts.controller';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<Post>
+  ) {}
 
   async getAll(
     groupId: string,
     parentId: string,
     page: number = 1,
     limit: number = 5,
+    type?: PostType,
   // ): Promise<PostLeanDocument[]> {
   ) {
     const matchStage: any = { parent_id: null, deleted_at: null };
@@ -22,6 +26,11 @@ export class PostsService {
 
     if (parentId) {
       matchStage.parent_id = new Types.ObjectId(parentId);
+    }
+
+    let sort: any = { created_at: -1 };
+    if(type === 'reply') {
+      sort.created_at = 1;
     }
 
     const skip = (page - 1) * limit;
@@ -57,7 +66,7 @@ export class PostsService {
         },
       },
       {
-        $sort: { created_at: -1 },
+        $sort: sort,
       },
       {
         $skip: skip,
@@ -115,7 +124,7 @@ export class PostsService {
   async create(userId: string, createPostDto: CreatePostDto): Promise<PostLeanDocument> {
     const newPost = new this.postModel({...createPostDto, user_id: userId});
     const savedPost = await newPost.save();
-
+    
     return savedPost.toObject() as unknown as PostLeanDocument;
   }
 

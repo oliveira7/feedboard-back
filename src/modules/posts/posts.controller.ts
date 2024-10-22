@@ -16,6 +16,12 @@ import { PostsService } from './posts.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { PostLeanDocument } from 'src/schemas';
 
+export enum PostType {
+  POST = 'post',
+  COMMENT = 'comment',
+  REPLY = 'reply',
+}
+
 @UseGuards(JwtAuthGuard)
 @Controller('posts')
 export class PostsController {
@@ -27,9 +33,10 @@ export class PostsController {
     @Query('parentId') parentId?: string,
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 5,
+    @Query('type') type?: PostType,
   // ): Promise<PostLeanDocument[]> {
   ) {
-    return this.postService.getAll(groupId, parentId, page, limit);
+    return this.postService.getAll(groupId, parentId, page, limit, type);
   }
 
   @Get(':id')
