@@ -1,5 +1,11 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsIn, IsOptional, IsString, ValidateNested } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsIn,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 class MediaItem {
   @IsString()
@@ -17,7 +23,7 @@ export class UpdatePostDto {
   @ValidateNested({ each: true })
   @Type(() => MediaItem)
   readonly media?: MediaItem[];
-  
+
   @IsOptional()
   @IsBoolean()
   readonly pinned?: boolean;

@@ -1,4 +1,11 @@
-import { IsBase64, IsEmail, IsHash, IsIn, IsNotEmpty, IsOptional } from "class-validator";
+import {
+  IsBase64,
+  IsEmail,
+  IsHash,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 enum Role {
   STUDENT = 'student',
@@ -21,7 +28,7 @@ export class CreateUsersDto {
   readonly email: string;
 
   @IsNotEmpty()
-  @IsHash('sha256') 
+  @IsHash('sha256')
   readonly password_hash: string;
 
   @IsOptional()

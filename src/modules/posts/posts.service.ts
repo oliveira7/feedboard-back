@@ -7,9 +7,7 @@ import { PostType } from './posts.controller';
 
 @Injectable()
 export class PostsService {
-  constructor(
-    @InjectModel(Post.name) private postModel: Model<Post>
-  ) {}
+  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
   async getAll(
     groupId: string,
@@ -17,7 +15,7 @@ export class PostsService {
     page: number = 1,
     limit: number = 5,
     type?: PostType,
-  // ): Promise<PostLeanDocument[]> {
+    // ): Promise<PostLeanDocument[]> {
   ) {
     const matchStage: any = { parent_id: null, deleted_at: null };
     if (groupId) {
@@ -29,7 +27,7 @@ export class PostsService {
     }
 
     let sort: any = { created_at: -1 };
-    if(type === 'reply') {
+    if (type === 'reply') {
       sort.created_at = 1;
     }
 
@@ -62,7 +60,7 @@ export class PostsService {
       },
       {
         $project: {
-          'children': 0,
+          children: 0,
         },
       },
       {
@@ -91,20 +89,20 @@ export class PostsService {
             avatar_base64: 1,
           },
         },
-      }
+      },
     ]);
 
-    const total = await this.postModel.countDocuments(
-      { ...matchStage, deleted_at: null },
-    ).exec();
-    
+    const total = await this.postModel
+      .countDocuments({ ...matchStage, deleted_at: null })
+      .exec();
+
     return {
-      page, 
+      page,
       totalPages: Math.ceil(total / limit),
       limit,
       total,
-      posts
-    }
+      posts,
+    };
   }
 
   async getOne(id: string): Promise<PostLeanDocument> {
@@ -121,10 +119,13 @@ export class PostsService {
   }
 
   //TODO: validar criações de postagens(id do pai é do pai mesmo??)
-  async create(userId: string, createPostDto: CreatePostDto): Promise<PostLeanDocument> {
-    const newPost = new this.postModel({...createPostDto, user_id: userId});
+  async create(
+    userId: string,
+    createPostDto: CreatePostDto,
+  ): Promise<PostLeanDocument> {
+    const newPost = new this.postModel({ ...createPostDto, user_id: userId });
     const savedPost = await newPost.save();
-    
+
     return savedPost.toObject() as unknown as PostLeanDocument;
   }
 

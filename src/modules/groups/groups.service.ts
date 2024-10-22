@@ -47,7 +47,7 @@ export class GroupsService {
               course: '$members.course',
               role: '$members.role',
             },
-          ]
+          ],
         },
       },
     ]);

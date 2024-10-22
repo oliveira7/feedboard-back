@@ -34,7 +34,7 @@ export class PostsController {
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 5,
     @Query('type') type?: PostType,
-  // ): Promise<PostLeanDocument[]> {
+    // ): Promise<PostLeanDocument[]> {
   ) {
     return this.postService.getAll(groupId, parentId, page, limit, type);
   }

@@ -35,7 +35,7 @@ export class InvitationsController {
   @Put('groups/:groupId')
   async addToGroup(
     @Param('groupId') groupId: string,
-    @Body() emailDto: EmailDto
+    @Body() emailDto: EmailDto,
   ): Promise<GroupLeanDocument> {
     const { email } = emailDto;
     return await this.invitationsService.addToGroup(groupId, email);
@@ -44,7 +44,7 @@ export class InvitationsController {
   @Delete('groups/:groupId')
   async deleteFromGroup(
     @Param('groupId') groupId: string,
-    @Body() emailDto: EmailDto
+    @Body() emailDto: EmailDto,
   ): Promise<void> {
     const { email } = emailDto;
     await this.invitationsService.deleteFromGroup(groupId, email);

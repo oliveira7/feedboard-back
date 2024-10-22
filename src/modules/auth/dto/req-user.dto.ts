@@ -1,5 +1,5 @@
-import { Type } from "class-transformer";
-import { IsEmail, IsMongoId, ValidateNested } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsEmail, IsMongoId, ValidateNested } from 'class-validator';
 
 class User {
   @IsMongoId()
