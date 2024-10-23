@@ -8,7 +8,7 @@ import { PostsModule } from './modules/posts/posts.module';
 import { ReactionsModule } from './modules/reactions/reactions.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { InvitationsModule } from './modules/invitations/invitations.module';
-import { Gateway } from './gateway/gateway';
+import { GatewayModule } from './gateway';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { Gateway } from './gateway/gateway';
     PostsModule,
     ReactionsModule,
     NotificationsModule,
-    Gateway,
+    GatewayModule,
   ],
 })
 export class AppModule {}

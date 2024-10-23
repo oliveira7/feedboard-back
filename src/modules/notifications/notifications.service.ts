@@ -27,33 +27,16 @@ export class NotificationsService {
     return savedNotification.toObject() as unknown as NotificationLeanDocument;
   }
 
-  async updateStatus(
-    id: string,
-    updateNotificationDto: UpdateNotificationsDto,
-  ): Promise<NotificationLeanDocument> {
-    const updatedNotification = await this.notificationModel
-      .findByIdAndUpdate(id, updateNotificationDto, { new: true })
-      .lean<NotificationLeanDocument>()
-      .exec();
+  async markAsRead(notificationId: string): Promise<NotificationLeanDocument> {
+    const notification = await this.notificationModel.findById(notificationId);
 
-    if (!updatedNotification) {
-      throw new NotFoundException(
-        `Notificação com o ID "${id}" não foi encontrado`,
-      );
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
     }
 
-    return updatedNotification;
-  }
+    notification.read = true;
+    await notification.save();
 
-  async delete(id: string): Promise<void> {
-    const result = await this.notificationModel.findByIdAndDelete(id).exec();
-
-    if (!result) {
-      throw new NotFoundException(
-        `Notificação com o ID "${id}" não foi encontrado`,
-      );
-    }
-
-    return;
+    return notification.toObject() as unknown as NotificationLeanDocument;
   }
 }

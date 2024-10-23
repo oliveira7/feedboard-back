@@ -1,13 +1,21 @@
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { Post, PostLeanDocument } from 'src/schemas';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { PostType } from './posts.controller';
+import { FeedGateway } from 'src/gateway';
+import { GroupsService } from '../groups';
+import { NotificationsService } from '../notifications';
 
 @Injectable()
-export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
+export class PostsService implements OnModuleInit {
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<Post>,
+    @Inject(GroupsService) private readonly groupsService: GroupsService,
+    @Inject(NotificationsService) private readonly notificationsService: any,
+    private readonly feedGateway: FeedGateway,
+  ) {}
 
   async getAll(
     groupId: string,
@@ -64,6 +72,24 @@ export class PostsService {
         },
       },
       {
+        $lookup: {
+          from: 'Reaction',
+          localField: '_id',
+          foreignField: 'post_id',
+          as: 'reaction',
+        },
+      },
+      {
+        $addFields: {
+          totalReaction: { $size: '$reaction' },
+        },
+      },
+      {
+        $project: {
+          reaction: 0,
+        },
+      },
+      {
         $sort: sort,
       },
       {
@@ -78,6 +104,7 @@ export class PostsService {
           parent_id: 1,
           group_id: 1,
           totalChildren: 1,
+          totalReaction: 1,
           pinned: 1,
           content: 1,
           media: 1,
@@ -118,13 +145,32 @@ export class PostsService {
     return post;
   }
 
-  //TODO: validar criações de postagens(id do pai é do pai mesmo??)
   async create(
     userId: string,
     createPostDto: CreatePostDto,
   ): Promise<PostLeanDocument> {
     const newPost = new this.postModel({ ...createPostDto, user_id: userId });
     const savedPost = await newPost.save();
+
+    let usersToNotify: string[] = [];
+    if (savedPost.group_id) {
+      const group = await this.groupsService.getAllUsersFromGroup(savedPost.group_id);
+      const { members } = group;
+      usersToNotify = members.map(userId => userId.toString());
+    }
+
+    usersToNotify = usersToNotify.filter(userId => userId !== savedPost.user_id.toString());
+
+    const notifications = usersToNotify.map(userId => ({
+      user_id: new Types.ObjectId(userId),
+      post_id: savedPost._id,
+      type: 'NEW_POST',
+      message: 'Um nova postagem foi feita pelo seu grupo.',
+    }));
+
+    await Promise.all(
+      notifications.map(notification => this.notificationsService.create(notification)),
+    );
 
     return savedPost.toObject() as unknown as PostLeanDocument;
   }
@@ -155,5 +201,13 @@ export class PostsService {
     }
 
     return;
+  }
+
+  async onModuleInit() {
+    const changeStream = this.postModel.watch();
+
+    changeStream.on('change', (change) => {
+      this.feedGateway.handleNewPost(change.fullDocument);
+    });
   }
 }

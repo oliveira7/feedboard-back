@@ -55,13 +55,14 @@ export type PostLeanDocument = {
   parent_id?: string | null;
   group_id?: string | null;
   content: string | null;
+  important: boolean; //professor added this
   media:
     | {
         base64: string;
         type: MediaType;
       }[]
     | [];
-  pinned: boolean;
+  pinned: boolean; //only professor
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;

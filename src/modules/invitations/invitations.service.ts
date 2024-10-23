@@ -73,6 +73,7 @@ export class InvitationsService {
 
   async deleteFromGroup(groupId: string, email: string): Promise<void> {
     const user = await this.usersService.getUserByEmail(email);
+    
     await this.groupsService.deleteUserFromGroup(groupId, user._id);
   }
 }

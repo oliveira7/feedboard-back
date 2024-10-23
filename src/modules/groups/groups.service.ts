@@ -1,7 +1,7 @@
 import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Group, GroupLeanDocument } from 'src/schemas';
+import { Group, GroupLeanDocument, UserLeanDocument } from 'src/schemas';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 
 @Injectable()
@@ -58,7 +58,7 @@ export class GroupsService {
 
     return group as unknown as GroupLeanDocument;
   }
-
+  
   async create(
     userId: string,
     createGroupDto: CreateGroupDto,
@@ -111,6 +111,10 @@ export class GroupsService {
       )
       .lean<GroupLeanDocument | null>()
       .exec();
+  }
+
+  async getAllUsersFromGroup(groupId: any) {
+    return await this.groupModel.findById(groupId).select('members').exec();
   }
 
   async deleteUserFromGroup(groupId: string, userId: string): Promise<void> {

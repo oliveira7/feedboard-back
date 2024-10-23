@@ -3,11 +3,6 @@ import { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
 
 enum ReactionType {
   LIKE = 'like',
-  LOVE = 'love',
-  HAHA = 'haha',
-  WOW = 'wow',
-  SAD = 'sad',
-  ANGRY = 'angry',
 }
 
 @Schema({
@@ -23,9 +18,6 @@ export class Reaction extends Document {
 
   @Prop({ type: String, enum: ReactionType, required: true })
   reaction_type: ReactionType;
-
-  @Prop({ type: Date, default: null })
-  deleted_at: Date | null;
 }
 
 export type ReactionLeanDocument = {
@@ -35,7 +27,6 @@ export type ReactionLeanDocument = {
   reaction_type: ReactionType;
   created_at: Date;
   updated_at: Date;
-  deleted_at: Date | null;
 };
 
 export type ReactionDocument = Reaction & Document;

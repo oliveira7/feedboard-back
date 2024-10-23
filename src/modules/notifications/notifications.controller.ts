@@ -1,16 +1,13 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   Put,
-  Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth';
+import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { NotificationsService } from './notifications.service';
-import { CreateNotificationsDto, UpdateNotificationsDto } from './dto';
 import { NotificationLeanDocument } from 'src/schemas';
 
 @UseGuards(JwtAuthGuard)
@@ -18,32 +15,16 @@ import { NotificationLeanDocument } from 'src/schemas';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @Get(':userId')
+  @Get()
   async getAllByUser(
-    @Param('userId') userId: string,
+    @Req() req: ReqUserDto,
   ): Promise<NotificationLeanDocument[]> {
-    return this.notificationsService.getAllByUser(userId);
+    const { _id } = req.user;
+    return this.notificationsService.getAllByUser(_id);
   }
 
-  @Post()
-  async create(
-    @Body() createNotificationDto: CreateNotificationsDto,
-  ): Promise<NotificationLeanDocument> {
-    return this.notificationsService.create(createNotificationDto);
-  }
-
-  @Put(':id')
-  async updateStatus(
-    @Param('id') id: string,
-    @Body() updateNotificationDto: UpdateNotificationsDto,
-  ): Promise<NotificationLeanDocument> {
-    return this.notificationsService.updateStatus(id, updateNotificationDto);
-  }
-
-  @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
-    this.notificationsService.delete(id);
-
-    return;
+  @Put(':id/read')
+  async markNotificationAsRead(@Param('id') id: string) {
+    return this.notificationsService.markAsRead(id);
   }
 }
