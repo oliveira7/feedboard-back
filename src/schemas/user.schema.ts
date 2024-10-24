@@ -18,16 +18,16 @@ export class User extends Document {
   @Prop({ type: String, required: true, unique: true })
   email: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: "Física" })
   course?: string;
 
   @Prop({ type: String })
   description?: string;
 
-  @Prop({ type: String, enum: Role, required: true })
+  @Prop({ type: String, enum: Role, required: false, default: Role.STUDENT })
   role: Role;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String})
   avatar_base64: string;
 
   @Prop({ type: String, required: true })

@@ -64,6 +64,7 @@ export class UsersService implements UsersServiceInterface {
   }
 
   async create(createUserDto: CreateUsersDto): Promise<UserLeanDocument> {
+   
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(createUserDto.password_hash, salt);
 
@@ -75,11 +76,13 @@ export class UsersService implements UsersServiceInterface {
 
     let savedUser: User;
     if (validate) {
-      const email = this.invitationsService.decodeInvitationToken(
+      const email = await this.invitationsService.decodeInvitationToken(
         createUserDto.token,
       );
+  
       const newUser = new this.userModel({
         ...createUserDto,
+        role: 'student',
         email,
         password_hash: hashedPassword,
       });
