@@ -118,7 +118,7 @@ export class InvitationsService implements InvitationsServiceInterface {
     if (!decoded.email) {
       throw new UnauthorizedException('Token inválido');
     }
-    
+
     return decoded.email;
   }
 }

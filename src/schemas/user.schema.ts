@@ -18,7 +18,7 @@ export class User extends Document {
   @Prop({ type: String, required: true, unique: true })
   email: string;
 
-  @Prop({ type: String, default: "Física" })
+  @Prop({ type: String, default: 'Física' })
   course?: string;
 
   @Prop({ type: String })
@@ -27,7 +27,7 @@ export class User extends Document {
   @Prop({ type: String, enum: Role, required: false, default: Role.STUDENT })
   role: Role;
 
-  @Prop({ type: String})
+  @Prop({ type: String })
   avatar_base64: string;
 
   @Prop({ type: String, required: true })

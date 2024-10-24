@@ -28,7 +28,7 @@ export class ReactionsService {
 
   async delete(userId: string, postId: string): Promise<void> {
     const result = await this.reactionModel
-      .findByIdAndDelete({
+      .deleteOne({
         post_id: new Types.ObjectId(postId),
         user_id: new Types.ObjectId(userId),
       })
