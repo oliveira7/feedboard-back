@@ -1,18 +1,17 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users';
-import { InvitationsService } from '../invitations';
+import { InvitationsService } from './invitations.service';
 import { GroupsModule } from '../groups';
 import { InvitationsController } from './invitations.controller';
 import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
 
 @Module({
   imports: [
-    UsersModule,
     GroupsModule,
-    InvitationsModule,
+    forwardRef(() => UsersModule),
     MongooseModule.forFeature([
       { name: Invitation.name, schema: InvitationSchema },
     ]),
@@ -37,7 +36,8 @@ import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
       inject: [ConfigService],
     }),
   ],
-  providers: [InvitationsService],
   controllers: [InvitationsController],
+  providers: [InvitationsService],
+  exports: [InvitationsService],
 })
 export class InvitationsModule {}

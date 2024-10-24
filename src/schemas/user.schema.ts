@@ -33,8 +33,8 @@ export class User extends Document {
   @Prop({ type: String, required: true })
   password_hash: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Notification' }] })
-  notifications: Types.ObjectId[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Notification' }], default: [] })
+  notifications?: Types.ObjectId[];
 
   @Prop({ type: Date, default: null })
   deleted_at: Date | null;
@@ -48,7 +48,7 @@ export type UserLeanDocument = {
   description?: string;
   password_hash: string;
   avatar_base64?: string;
-  notifications: any[];
+  notifications?: any[];
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;

@@ -1,6 +1,8 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,10 +10,17 @@ import {
 import * as bcrypt from 'bcryptjs';
 import { CreateUsersDto, UpdateUsersDto } from './dto';
 import { User, UserLeanDocument } from 'src/schemas';
+import { UsersServiceInterface } from './users.interface';
+import { InvitationsServiceInterface } from '../invitations/invitations.interface';
+import { InvitationsService } from '../invitations';
 
 @Injectable()
-export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+export class UsersService implements UsersServiceInterface {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    @Inject(forwardRef(() => InvitationsService))
+    private invitationsService: InvitationsServiceInterface,
+  ) {}
 
   async getAll(
     page: number,
@@ -58,12 +67,25 @@ export class UsersService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(createUserDto.password_hash, salt);
 
-    const newUser = new this.userModel({
-      ...createUserDto,
-      password_hash: hashedPassword,
-    });
+    const validate = this.invitationsService.validateToken(createUserDto.token);
 
-    const savedUser = await newUser.save();
+    if (!validate) {
+      throw new UnauthorizedException('Token inválido');
+    }
+
+    let savedUser: User;
+    if (validate) {
+      const email = this.invitationsService.decodeInvitationToken(
+        createUserDto.token,
+      );
+      const newUser = new this.userModel({
+        ...createUserDto,
+        email,
+        password_hash: hashedPassword,
+      });
+
+      savedUser = await newUser.save();
+    }
 
     return savedUser.toObject() as unknown as UserLeanDocument;
   }

@@ -1,27 +1,35 @@
 import { JwtService } from '@nestjs/jwt';
-import { Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users';
 import { GroupsService } from '../groups';
 import { GroupLeanDocument, Invitation } from 'src/schemas';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { InvitationsServiceInterface } from './invitations.interface';
+import { UsersServiceInterface } from '../users/users.interface';
 
 @Injectable()
-export class InvitationsService {
+export class InvitationsService implements InvitationsServiceInterface {
   constructor(
-    @InjectModel(Invitation.name) private invitationsModel: Model<Invitation>,
-    private readonly jwtService: JwtService,
-    private readonly mailerService: MailerService,
-    private readonly usersService: UsersService,
-    private readonly groupsService: GroupsService,
+    @InjectModel(Invitation.name) private invitationModel: Model<Invitation>,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersServiceInterface,
+    @Inject(GroupsService) private groupsService: GroupsService,
+    @Inject(JwtService) private jwtService: JwtService,
+    @Inject(MailerService) private mailerService: MailerService,
   ) {}
 
   async sendInvitations(emails: string[]): Promise<void> {
     const invitations = emails.map(async (email) => {
       const token = this.jwtService.sign({ email }, { expiresIn: '7d' });
 
-      const newInvitation = new this.invitationsModel({
+      const newInvitation = new this.invitationModel({
         email,
         token,
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -85,5 +93,32 @@ export class InvitationsService {
     const user = await this.usersService.getUserByEmail(email);
 
     await this.groupsService.deleteUserFromGroup(groupId, user._id);
+  }
+
+  async validateToken(token: string): Promise<boolean> {
+    const invitation = await this.invitationModel
+      .findOne({
+        token,
+        used: false,
+        expires_at: { $gte: new Date() },
+      })
+      .lean<Invitation | null>()
+      .exec();
+
+    if (!invitation) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async decodeInvitationToken(token: string): Promise<string> {
+    const decoded = this.jwtService.verify(token);
+
+    if (!decoded.email) {
+      throw new UnauthorizedException('Token inválido');
+    }
+    
+    return decoded.email;
   }
 }

@@ -26,16 +26,16 @@ export class ReactionsService {
     return savedReaction.toObject() as unknown as ReactionLeanDocument;
   }
 
-  async delete(userId: string, reactionId: string): Promise<void> {
+  async delete(userId: string, postId: string): Promise<void> {
     const result = await this.reactionModel
       .findByIdAndDelete({
-        _id: new Types.ObjectId(reactionId),
-        user_id: userId,
+        post_id: new Types.ObjectId(postId),
+        user_id: new Types.ObjectId(userId),
       })
       .exec();
 
     if (!result) {
-      throw new NotFoundException(`Reaction with ID "${reactionId}" not found`);
+      throw new NotFoundException(`Reação não encontrada`);
     }
 
     return;

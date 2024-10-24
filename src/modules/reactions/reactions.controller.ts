@@ -25,12 +25,9 @@ export class ReactionsController {
     return this.reactionsService.create(_id, createReactionDto);
   }
 
-  @Delete(':reactionId')
-  async delete(
-    @Req() req: ReqUserDto,
-    @Param('reactionId') reactionId: string,
-  ) {
+  @Delete('/posts/:postId')
+  async delete(@Req() req: ReqUserDto, @Param('postId') postId: string) {
     const { _id } = req.user;
-    return this.reactionsService.delete(_id, reactionId);
+    return this.reactionsService.delete(_id, postId);
   }
 }
