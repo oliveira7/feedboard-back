@@ -1,6 +1,11 @@
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Post, PostLeanDocument } from 'src/schemas';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { PostType } from './posts.controller';
@@ -80,13 +85,32 @@ export class PostsService implements OnModuleInit {
         },
       },
       {
+        $lookup: {
+          from: 'User',
+          localField: 'reaction.user_id',
+          foreignField: '_id',
+          as: 'reactedUsers',
+        },
+      },
+      {
         $addFields: {
+          peoplesReacted: {
+            $map: {
+              input: '$reactedUsers',
+              as: 'user',
+              in: {
+                user_id: '$$user._id',
+                name: '$$user.name',
+              },
+            },
+          },
           totalReaction: { $size: '$reaction' },
         },
       },
       {
         $project: {
           reaction: 0,
+          reactedUsers: 0,
         },
       },
       {
@@ -105,6 +129,7 @@ export class PostsService implements OnModuleInit {
           group_id: 1,
           totalChildren: 1,
           totalReaction: 1,
+          peoplesReacted: 1,
           pinned: 1,
           content: 1,
           media: 1,
@@ -154,14 +179,18 @@ export class PostsService implements OnModuleInit {
 
     let usersToNotify: string[] = [];
     if (savedPost.group_id) {
-      const group = await this.groupsService.getAllUsersFromGroup(savedPost.group_id);
+      const group = await this.groupsService.getAllUsersFromGroup(
+        savedPost.group_id,
+      );
       const { members } = group;
-      usersToNotify = members.map(userId => userId.toString());
+      usersToNotify = members.map((userId) => userId.toString());
     }
 
-    usersToNotify = usersToNotify.filter(userId => userId !== savedPost.user_id.toString());
+    usersToNotify = usersToNotify.filter(
+      (userId) => userId !== savedPost.user_id.toString(),
+    );
 
-    const notifications = usersToNotify.map(userId => ({
+    const notifications = usersToNotify.map((userId) => ({
       user_id: new Types.ObjectId(userId),
       post_id: savedPost._id,
       type: 'NEW_POST',
@@ -169,7 +198,9 @@ export class PostsService implements OnModuleInit {
     }));
 
     await Promise.all(
-      notifications.map(notification => this.notificationsService.create(notification)),
+      notifications.map((notification) =>
+        this.notificationsService.create(notification),
+      ),
     );
 
     return savedPost.toObject() as unknown as PostLeanDocument;

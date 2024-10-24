@@ -58,7 +58,7 @@ export class GroupsService {
 
     return group as unknown as GroupLeanDocument;
   }
-  
+
   async create(
     userId: string,
     createGroupDto: CreateGroupDto,

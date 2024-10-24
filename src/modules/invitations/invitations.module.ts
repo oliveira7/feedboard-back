@@ -12,6 +12,7 @@ import { Invitation, InvitationSchema } from 'src/schemas/invitation.schema';
   imports: [
     UsersModule,
     GroupsModule,
+    InvitationsModule,
     MongooseModule.forFeature([
       { name: Invitation.name, schema: InvitationSchema },
     ]),

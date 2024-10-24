@@ -43,6 +43,7 @@ export class UsersService {
   async getOne(id: string): Promise<UserLeanDocument> {
     const user = await this.userModel
       .findById(id)
+      .select('-password_hash')
       .lean<UserLeanDocument | null>()
       .exec();
 

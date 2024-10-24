@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Put,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Param, Put, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { NotificationsService } from './notifications.service';
 import { NotificationLeanDocument } from 'src/schemas';

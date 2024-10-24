@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Notification, NotificationLeanDocument } from 'src/schemas';
-import { CreateNotificationsDto, UpdateNotificationsDto } from './dto';
+import { CreateNotificationsDto } from './dto';
 
 @Injectable()
 export class NotificationsService {
@@ -31,7 +31,7 @@ export class NotificationsService {
     const notification = await this.notificationModel.findById(notificationId);
 
     if (!notification) {
-      throw new NotFoundException('Notification not found');
+      throw new NotFoundException('Notificação não encontrada');
     }
 
     notification.read = true;

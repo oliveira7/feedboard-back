@@ -26,7 +26,10 @@ export class ReactionsController {
   }
 
   @Delete(':reactionId')
-  async delete(@Req() req: ReqUserDto, @Param('reactionId') reactionId: string) {
+  async delete(
+    @Req() req: ReqUserDto,
+    @Param('reactionId') reactionId: string,
+  ) {
     const { _id } = req.user;
     return this.reactionsService.delete(_id, reactionId);
   }

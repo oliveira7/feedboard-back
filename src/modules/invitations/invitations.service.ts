@@ -3,12 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users';
 import { GroupsService } from '../groups';
-import { GroupLeanDocument } from 'src/schemas';
-import { EmailsDto } from './dto';
+import { GroupLeanDocument, Invitation } from 'src/schemas';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class InvitationsService {
   constructor(
+    @InjectModel(Invitation.name) private invitationsModel: Model<Invitation>,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly usersService: UsersService,
@@ -16,8 +18,16 @@ export class InvitationsService {
   ) {}
 
   async sendInvitations(emails: string[]): Promise<void> {
-    const invitations = emails.map((email) => {
+    const invitations = emails.map(async (email) => {
       const token = this.jwtService.sign({ email }, { expiresIn: '7d' });
+
+      const newInvitation = new this.invitationsModel({
+        email,
+        token,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+      const savedInvitation = await newInvitation.save();
+
       const link = `http://feedboard.com/register?token=${token}`;
 
       return this.mailerService.sendMail({
@@ -73,7 +83,7 @@ export class InvitationsService {
 
   async deleteFromGroup(groupId: string, email: string): Promise<void> {
     const user = await this.usersService.getUserByEmail(email);
-    
+
     await this.groupsService.deleteUserFromGroup(groupId, user._id);
   }
 }
