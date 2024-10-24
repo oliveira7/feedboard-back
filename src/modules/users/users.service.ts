@@ -97,13 +97,13 @@ export class UsersService implements UsersServiceInterface {
     updateUserDto: UpdateUsersDto,
   ): Promise<UserLeanDocument> {
     let updateData = { ...updateUserDto };
-    if (updateUserDto.password_hash) {
-      const salt = await bcrypt.genSalt(10);
-      updateData = {
-        ...updateData,
-        password_hash: await bcrypt.hash(updateUserDto.password_hash, salt),
-      };
-    }
+    // if (updateUserDto.password_hash) {
+    //   const salt = await bcrypt.genSalt(10);
+    //   updateData = {
+    //     ...updateData,
+    //     password_hash: await bcrypt.hash(updateUserDto.password_hash, salt),
+    //   };
+    // }
 
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateData, { new: true })
