@@ -11,7 +11,8 @@ export class GroupsService {
   async getAllByUser(userId: string): Promise<GroupLeanDocument[] | []> {
     return await this.groupModel
       .find({
-        created_by: new Types.ObjectId(userId),
+        // created_by: new Types.ObjectId(userId),
+        members: { $in: [new Types.ObjectId(userId)] },
         deleted_at: null,
       })
       .lean<GroupLeanDocument[] | []>()
