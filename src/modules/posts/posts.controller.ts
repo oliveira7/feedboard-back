@@ -34,12 +34,20 @@ export class PostsController {
   async getPosts(
     @Query('groupId') groupId?: string,
     @Query('parentId') parentId?: string,
+    @Query('userId') userId?: string,
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 5,
     @Query('type') type?: PostType,
     // ): Promise<PostLeanDocument[]> {
   ) {
-    return this.postService.getAll(groupId, parentId, page, limit, type);
+    return this.postService.getAll(
+      groupId,
+      parentId,
+      userId,
+      page,
+      limit,
+      type,
+    );
   }
 
   @Get(':id')

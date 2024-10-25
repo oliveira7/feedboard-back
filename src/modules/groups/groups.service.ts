@@ -43,7 +43,7 @@ export class GroupsService {
             {
               _id: '$members._id',
               name: '$members.name',
-              avatar_base64: '$members.avatar_base64',
+              avatar: '$members.avatar',
               course: '$members.course',
               role: '$members.role',
             },

@@ -27,6 +27,7 @@ export class PostsService implements OnModuleInit {
   async getAll(
     groupId: string,
     parentId: string,
+    userId: string,
     page: number = 1,
     limit: number = 5,
     type?: PostType,
@@ -39,6 +40,10 @@ export class PostsService implements OnModuleInit {
 
     if (parentId) {
       matchStage.parent_id = new Types.ObjectId(parentId);
+    }
+
+    if (userId) {
+      matchStage.user_id = new Types.ObjectId(userId);
     }
 
     let sort: any = { created_at: -1 };
@@ -140,7 +145,7 @@ export class PostsService implements OnModuleInit {
           author: {
             _id: 1,
             name: 1,
-            avatar_base64: 1,
+            avatar: 1,
           },
         },
       },
