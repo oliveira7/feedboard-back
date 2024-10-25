@@ -10,11 +10,14 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { PostsService } from './posts.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { PostLeanDocument } from 'src/schemas';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 export enum PostType {
   POST = 'post',
@@ -45,20 +48,24 @@ export class PostsController {
   }
 
   @Post()
+  @UseInterceptors(FilesInterceptor('files'))
   async create(
     @Req() req: ReqUserDto,
     @Body() createPostDto: CreatePostDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<PostLeanDocument> {
     const { _id } = req.user;
-    return this.postService.create(_id, createPostDto);
+    return this.postService.create(_id, createPostDto, files);
   }
 
   @Put(':id')
+  @UseInterceptors(FilesInterceptor('files'))
   async update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<PostLeanDocument> {
-    return this.postService.update(id, updatePostDto);
+    return this.postService.update(id, updatePostDto, files);
   }
 
   @Delete(':id')

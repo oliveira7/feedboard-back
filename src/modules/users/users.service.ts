@@ -13,6 +13,8 @@ import { User, UserLeanDocument } from 'src/schemas';
 import { UsersServiceInterface } from './users.interface';
 import { InvitationsServiceInterface } from '../invitations/invitations.interface';
 import { InvitationsService } from '../invitations';
+import sharp from 'sharp';
+import { put } from '@vercel/blob';
 
 @Injectable()
 export class UsersService implements UsersServiceInterface {
@@ -95,8 +97,24 @@ export class UsersService implements UsersServiceInterface {
   async update(
     id: string,
     updateUserDto: UpdateUsersDto,
+    avatar: Express.Multer.File,
   ): Promise<UserLeanDocument> {
     let updateData = { ...updateUserDto };
+
+    if (avatar) {
+      const webpBuffer = await sharp(avatar.buffer).webp().toBuffer();
+
+      const { url } = await put(`${id}.webp`, webpBuffer, {
+        contentType: 'image/webp',
+        access: 'public',
+      });
+
+      updateData = {
+        ...updateData,
+        avatar: url,
+      };
+    }
+
     // if (updateUserDto.password_hash) {
     //   const salt = await bcrypt.genSalt(10);
     //   updateData = {

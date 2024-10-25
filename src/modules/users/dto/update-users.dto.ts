@@ -1,6 +1,4 @@
-import {
-  IsOptional,
-} from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateUsersDto {
   @IsOptional()
@@ -24,5 +22,5 @@ export class UpdateUsersDto {
   // readonly email: string;
 
   @IsOptional()
-  readonly avatar_base64?: string;
+  readonly avatar?: string;
 }

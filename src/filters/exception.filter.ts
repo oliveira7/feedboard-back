@@ -12,7 +12,7 @@ export class ExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-
+    console.log('Exception:', exception);
     let status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -25,7 +25,8 @@ export class ExceptionsFilter implements ExceptionFilter {
 
     response.status(status).json({
       statusCode: status,
-      message: message.error,
+      error: message.error,
+      message: message.message,
       path: request.url,
       timestamp: new Date().toISOString(),
     });

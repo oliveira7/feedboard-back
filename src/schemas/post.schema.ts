@@ -31,14 +31,14 @@ export class Post extends Document {
   @Prop({
     type: [
       {
-        base64: { type: String, required: true },
+        url: { type: String, required: true },
         type: { type: String, enum: MediaType, required: true },
       },
     ],
     default: [],
   })
   media: Array<{
-    base64: string;
+    url: string;
     type: MediaType;
   }>;
 

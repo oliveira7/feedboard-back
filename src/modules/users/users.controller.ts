@@ -9,7 +9,10 @@ import {
   UseGuards,
   Query,
   ParseIntPipe,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { CreateUsersDto, UpdateUsersDto } from './dto';
 import { JwtAuthGuard } from '../auth';
@@ -44,11 +47,13 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUsersDto,
+    @UploadedFile() avatar: Express.Multer.File,
   ): Promise<UserLeanDocument> {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto, avatar);
   }
 
   @UseGuards(JwtAuthGuard)

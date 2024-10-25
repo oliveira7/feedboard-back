@@ -12,6 +12,8 @@ import { PostType } from './posts.controller';
 import { FeedGateway } from 'src/gateway';
 import { GroupsService } from '../groups';
 import { NotificationsService } from '../notifications';
+import sharp from 'sharp';
+import { put } from '@vercel/blob';
 
 @Injectable()
 export class PostsService implements OnModuleInit {
@@ -173,8 +175,36 @@ export class PostsService implements OnModuleInit {
   async create(
     userId: string,
     createPostDto: CreatePostDto,
+    files: Array<Express.Multer.File>,
   ): Promise<PostLeanDocument> {
-    const newPost = new this.postModel({ ...createPostDto, user_id: userId });
+    let media = [];
+
+    if (files) {
+      media = await Promise.all(
+        files.map(async (file) => {
+          const buffer = await sharp(file.buffer).webp().toBuffer();
+          const { url } = await put(
+            `${new Date().toISOString()}.webp`,
+            buffer,
+            {
+              contentType: 'image/webp',
+              access: 'public',
+            },
+          );
+
+          return {
+            url,
+            type: 'image',
+          };
+        }),
+      );
+    }
+    console.log('parou aqui?');
+    const newPost = new this.postModel({
+      ...createPostDto,
+      media,
+      user_id: userId,
+    });
     const savedPost = await newPost.save();
 
     let usersToNotify: string[] = [];
@@ -209,7 +239,32 @@ export class PostsService implements OnModuleInit {
   async update(
     id: string,
     updatePostDto: UpdatePostDto,
+    files: Array<Express.Multer.File>,
   ): Promise<PostLeanDocument> {
+    let media = [];
+
+    if (files && files.length) {
+      media = await Promise.all(
+        files.map(async (file) => {
+          const buffer = await sharp(file.buffer).webp().toBuffer();
+          const { url } = await put(
+            `${new Date().toISOString()}.webp`,
+            buffer,
+            {
+              contentType: 'image/webp',
+              access: 'public',
+            },
+          );
+
+          return {
+            url,
+            type: 'image',
+          };
+        }),
+      );
+      updatePostDto = { ...updatePostDto, media };
+    }
+
     const updatedPost = await this.postModel
       .findByIdAndUpdate(id, updatePostDto)
       .lean<PostLeanDocument>()
