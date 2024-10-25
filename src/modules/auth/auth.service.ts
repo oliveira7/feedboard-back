@@ -8,6 +8,7 @@ export class AuthService {
   async login(user: {
     _id: string;
     email: string;
+    role: string;
   }): Promise<{ access_token: string }> {
     if (!user.email || !user._id) {
       throw new UnauthorizedException('User data is missing');

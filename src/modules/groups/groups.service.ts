@@ -31,7 +31,6 @@ export class GroupsService {
           as: 'members',
         },
       },
-      { $unwind: '$members' },
       {
         $project: {
           _id: 1,
@@ -39,15 +38,14 @@ export class GroupsService {
           created_by: 1,
           created_at: 1,
           updated_at: 1,
-          members: [
+          members:
             {
-              _id: '$members._id',
-              name: '$members.name',
-              avatar: '$members.avatar',
-              course: '$members.course',
-              role: '$members.role',
+              _id: 1,
+              name: 1,
+              avatar: 1,
+              course: 1,
+              role: 1,
             },
-          ],
         },
       },
     ]);
@@ -56,7 +54,7 @@ export class GroupsService {
       throw new NotFoundException(`Grupo com ID "${id}" não foi encontrado`);
     }
 
-    return group as unknown as GroupLeanDocument;
+    return group[0] as unknown as GroupLeanDocument;
   }
 
   async create(

@@ -33,7 +33,7 @@ export class PostsService implements OnModuleInit {
     type?: PostType,
     // ): Promise<PostLeanDocument[]> {
   ) {
-    const matchStage: any = { parent_id: null, deleted_at: null };
+    const matchStage: any = { group_id: null, parent_id: null, deleted_at: null };
     if (groupId) {
       matchStage.group_id = new Types.ObjectId(groupId);
     }

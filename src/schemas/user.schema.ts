@@ -46,6 +46,7 @@ export type UserLeanDocument = {
   email: string;
   course?: string;
   description?: string;
+  role: string;
   password_hash: string;
   avatar?: string;
   notifications?: any[];
