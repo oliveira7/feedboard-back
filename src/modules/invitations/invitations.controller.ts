@@ -6,10 +6,11 @@ import {
   Delete,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { InvitationsService } from './invitations.service';
 import { GroupLeanDocument } from 'src/schemas';
-import { JwtAuthGuard } from '../auth';
+import { JwtAuthGuard, ReqUserDto } from '../auth';
 import { EmailDto, EmailsDto } from './dto';
 
 @UseGuards(JwtAuthGuard)
@@ -26,8 +27,14 @@ export class InvitationsController {
   }
 
   @Post('informations')
-  async sendInformations(@Body('message') message: string): Promise<void> {
-    await this.invitationsService.sendInformations(message);
+  async sendInformations(
+    @Req() req: ReqUserDto,
+    @Body() body: { subject: string; message: string }
+  ): Promise<void> {
+    const { subject, message } = body;
+    const { _id } = req.user;
+
+    await this.invitationsService.sendInformations(subject, message, _id);
 
     return;
   }

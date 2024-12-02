@@ -61,18 +61,21 @@ export class InvitationsService implements InvitationsServiceInterface {
     await Promise.all(invitations);
   }
 
-  async sendInformations(message: string): Promise<void> {
+  async sendInformations(subject: string, message: string, userId: string): Promise<void> {
     const students = await this.usersService.getAllStudents();
+    const coordinator = await this.usersService.getUserById(userId);
+    
     const emails = students.map((student) => student.email);
 
     const emailPromises = emails.map((email) => {
       return this.mailerService.sendMail({
         to: email,
-        subject: 'Informativo importante',
+        subject: `${subject}`,
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-            <h2 style="color: #4CAF50;">Mensagem da Coordenadora</h2>
+            <h2 style="color: #4CAF50;">Mensagem da(o) ${coordinator.name}</h2>
             <p>${message}</p>
+            <hr>
             <p>Atenciosamente,</p>
             <p>Equipe de Coordenação</p>
           </div>

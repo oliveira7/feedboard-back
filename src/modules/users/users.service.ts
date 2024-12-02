@@ -171,6 +171,19 @@ export class UsersService implements UsersServiceInterface {
     return user;
   }
 
+  async getUserById(_id: string): Promise<any> {
+    const user = await this.userModel
+      .findById(_id)
+      .lean<UserLeanDocument | null>()
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID "${_id}" não foi encontrado`);
+    }
+
+    return user;
+  }
+
   async validateUser(
     email: string,
     password: string,
