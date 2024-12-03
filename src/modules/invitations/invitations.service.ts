@@ -36,7 +36,7 @@ export class InvitationsService implements InvitationsServiceInterface {
       });
       const savedInvitation = await newInvitation.save();
 
-      const link = `http://feedboard.com/register?token=${token}`;
+      const link = `https://feedboard-front-three.vercel.app/cadastro?token=${token}`;
 
       return this.mailerService.sendMail({
         to: email,
